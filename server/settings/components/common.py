@@ -22,6 +22,7 @@ SECRET_KEY = config("DJANGO_SECRET_KEY")
 INSTALLED_APPS: tuple[str, ...] = (
     # Your apps go here:
     "server.apps.main",
+    "server.apps.users",
     # Default django apps:
     "django.contrib.auth",
     "django.contrib.contenttypes",
@@ -41,6 +42,13 @@ INSTALLED_APPS: tuple[str, ...] = (
     "health_check.db",
     "health_check.cache",
     "health_check.storage",
+    # Rest framework:
+    "rest_framework",
+    # "rest_framework_simplejwt",
+    # "rest_framework_simplejwt.token_blacklist",
+    # "rest_framework_simplejwt.token_blacklist.models",
+    # "rest_framework_simplejwt.token_blacklist.views",
+    "drf_spectacular",
 )
 
 MIDDLEWARE: tuple[str, ...] = (
@@ -318,4 +326,22 @@ JAZZMIN_SETTINGS = {
         "auth.user": "collapsible",
         "auth.group": "vertical_tabs",
     },
+}
+
+REST_FRAMEWORK = {
+    # Use Django's standard `django.contrib.auth` permissions,
+    # or allow read-only access for unauthenticated users.
+    "DEFAULT_PERMISSION_CLASSES": [
+        "rest_framework.permissions.DjangoModelPermissionsOrAnonReadOnly"
+    ],
+    "DEFAULT_SCHEMA_CLASS": "drf_spectacular.openapi.AutoSchema",
+}
+
+SPECTACULAR_SETTINGS = {
+    "TITLE": "Engine Sync API",
+    "DESCRIPTION": "Engine Sync API",
+    "VERSION": "1.0.0",
+    "SERVE_INCLUDE_SCHEMA": False,
+    "COMPONENT_SPLIT_REQUEST": True,
+    "SERVE_PERMISSIONS": ["rest_framework.permissions.AllowAny"],
 }
