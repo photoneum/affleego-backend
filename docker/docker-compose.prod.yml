@@ -6,21 +6,19 @@
 # See `./docs/pages/template/production.rst` docs.
 
 services:
-  caddy:
+  nginx:
     build:
       context: .
-      dockerfile: ./docker/caddy/Dockerfile
+      dockerfile: ./docker/nginx/Dockerfile
     restart: unless-stopped
     env_file: ./config/.env
     volumes:
-      - ./docker/caddy/Caddyfile:/etc/caddy/Caddyfile  # configuration
-      - ./docker/caddy/ci.sh:/etc/ci.sh  # test script
-      - caddy-config:/config  # configuration autosaves
-      - caddy-data:/data  # saving certificates
-      - django-static:/var/www/django/static  # serving django's statics
-      - django-media:/var/www/django/media  # serving django's media
+      - ./docker/nginx/nginx.conf:/etc/nginx/conf.d/default.conf # configuration
+      - ./docker/nginx/ci.sh:/etc/ci.sh # test script
+      - django-static:/var/www/django/static # serving django's statics
+      - django-media:/var/www/django/media # serving django's media
     ports:
-      - "80:80"
+      - "8081:80"
       - "443:443"
     depends_on:
       - web
@@ -28,17 +26,19 @@ services:
       - proxy-net
 
   web:
-    <<: &web  # Image for production:
-      image: "registry.gitlab.com/polymarq/engine-sync-backend:latest"
+    <<: &web # Image for production:
+      image: "engine-sync-backend:prod"
       build:
         target: production_build
+        context: .
+        dockerfile: ./docker/django/Dockerfile
         args:
           DJANGO_ENV: production
 
       restart: unless-stopped
       volumes:
-        - django-media:/var/www/django/media  # since in dev it is app's folder
-        - django-locale:/code/locale  # since in dev it is app's folder
+        - django-media:/var/www/django/media # since in dev it is app's folder
+        - django-locale:/code/locale # since in dev it is app's folder
 
     command: bash ./docker/django/gunicorn.sh
     networks:
@@ -61,5 +61,4 @@ networks:
 volumes:
   django-media:
   django-locale:
-  caddy-config:
-  caddy-data:
+  django-static:

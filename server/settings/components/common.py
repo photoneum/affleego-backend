@@ -73,6 +73,10 @@ MIDDLEWARE: tuple[str, ...] = (
 
 ROOT_URLCONF = "server.urls"
 
+# Disable automatic trailing slash redirection
+# https://docs.djangoproject.com/en/4.2/ref/settings/#append-slash
+APPEND_SLASH = False
+
 WSGI_APPLICATION = "server.wsgi.application"
 
 
