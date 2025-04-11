@@ -24,8 +24,6 @@ services:
     command: bash ./docker/django/gunicorn.sh
     networks:
       - proxy-net
-    ports:
-      - "8081:8000"
 
   nginx:
     build:
@@ -41,6 +39,8 @@ services:
       - web
     networks:
       - proxy-net
+    ports:
+      - "8081:80"
 
 # This task is an example of how to extend existing ones:
 #   some_worker:
