@@ -1,0 +1,49 @@
+name: Deploy dev
+
+on:
+  pull_request:
+    branches:
+      - develop
+    paths-ignore: ["docs/**"]
+
+  push:
+    branches:
+      - develop
+    paths-ignore: ["docs/**"]
+
+concurrency:
+  group: ${{ github.head_ref || github.run_id }}
+  cancel-in-progress: true
+
+jobs:
+  deploy:
+    runs-on: ubuntu-latest
+    environment: development
+    if: ${{ github.event_name == 'push' }} # will be fired if the trigger event is a push event.
+
+    steps:
+      - name: Checkout Code Repository
+        uses: actions/checkout@v3
+
+      - name: Copy repo files to server
+        uses: appleboy/scp-action@master
+        with:
+          host: ${{ secrets.SERVER_HOST }}
+          username: ${{ secrets.SERVER_USERNAME }}
+          key: ${{ secrets.SERVER_SSH_KEY }}
+          port: 22
+          source: "."
+          target: "~/engine-sync-backend"
+
+      - name: Build and Deploy the Stack
+        uses: appleboy/ssh-action@master
+        with:
+          host: ${{ secrets.SERVER_HOST }}
+          username: ${{ secrets.SERVER_USERNAME }}
+          key: ${{ secrets.SERVER_SSH_KEY }}
+          port: 22
+          script: |
+            cd ~/engine-sync-backend
+            docker compose -f docker-compose.yml -f docker/docker-compose.dev.yml down
+            docker compose -f docker-compose.yml -f docker/docker-compose.dev.yml build
+            docker compose -f docker-compose.yml -f docker/docker-compose.dev.yml up -d  --no-deps --build --force-recreate --remove-orphans
