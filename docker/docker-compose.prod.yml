@@ -6,25 +6,6 @@
 # See `./docs/pages/template/production.rst` docs.
 
 services:
-  nginx:
-    build:
-      context: .
-      dockerfile: ./docker/nginx/Dockerfile
-    restart: unless-stopped
-    env_file: ./config/.env
-    volumes:
-      - ./docker/nginx/nginx.conf:/etc/nginx/conf.d/default.conf # configuration
-      - ./docker/nginx/ci.sh:/etc/ci.sh # test script
-      - django-static:/var/www/django/static # serving django's statics
-      - django-media:/var/www/django/media # serving django's media
-    ports:
-      - "8081:80"
-      - "443:443"
-    depends_on:
-      - web
-    networks:
-      - proxy-net
-
   web:
     <<: &web # Image for production:
       image: "engine-sync-backend:prod"
@@ -43,8 +24,23 @@ services:
     command: bash ./docker/django/gunicorn.sh
     networks:
       - proxy-net
-    expose:
-      - 8000
+    ports:
+      - "8081:8000"
+
+  nginx:
+    build:
+      context: .
+      dockerfile: ./docker/nginx/Dockerfile
+    restart: unless-stopped
+    volumes:
+      - ./docker/nginx/nginx.conf:/etc/nginx/conf.d/default.conf # configuration
+      - ./docker/nginx/ci.sh:/etc/ci.sh # test script
+      - django-static:/var/www/django/static # serving django's statics
+      - django-media:/var/www/django/media # serving django's media
+    depends_on:
+      - web
+    networks:
+      - proxy-net
 
 # This task is an example of how to extend existing ones:
 #   some_worker:
