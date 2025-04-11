@@ -42,7 +42,7 @@ services:
     networks:
       - proxy-net
     ports:
-      - "8081:8000"
+      - "8081:80"
 
 # This task is an example of how to extend existing ones:
 #   some_worker:
