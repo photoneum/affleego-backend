@@ -31,7 +31,7 @@ services:
       build:
         target: production_build
         context: .
-        dockerfile: ./django/Dockerfile
+        dockerfile: ./docker/django/Dockerfile
         args:
           DJANGO_ENV: production
 
