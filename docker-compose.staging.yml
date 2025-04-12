@@ -1,0 +1,60 @@
+---
+# This compose-file is staging only. So, it should not be called directly.
+#
+# Instead, it should be a part of your deployment strategy.
+# This setup is supposed to be used with `docker-swarm`.
+# See `./docs/pages/template/staging.rst` docs.
+
+services:
+  web:
+    <<: &web # Image for staging:
+      image: "engine-sync-backend:staging"
+      build:
+        target: production_build
+        context: .
+        dockerfile: ./docker/django/Dockerfile
+        args:
+          DJANGO_ENV: staging
+
+      restart: unless-stopped
+      volumes:
+        - django-media:/var/www/django/media # since in dev it is app's folder
+        - django-locale:/code/locale # since in dev it is app's folder
+
+    command: bash ./docker/django/gunicorn.sh
+    networks:
+      - proxy-net
+
+  nginx:
+    build:
+      context: .
+      dockerfile: ./docker/nginx/Dockerfile
+    restart: unless-stopped
+    volumes:
+      - ./docker/nginx/nginx.conf:/etc/nginx/conf.d/default.conf # configuration
+      - ./docker/nginx/ci.sh:/etc/ci.sh # test script
+      - django-static:/var/www/django/static # serving django's statics
+      - django-media:/var/www/django/media # serving django's media
+    depends_on:
+      - web
+    networks:
+      - proxy-net
+    ports:
+      - "8081:80"
+
+# This task is an example of how to extend existing ones:
+#   some_worker:
+#     <<: *web
+#     command: python manage.py worker_process
+#     deploy:
+#       replicas: 2
+
+networks:
+  # Network for your proxy server and application to connect them,
+  # do not use it for anything else!
+  proxy-net:
+
+volumes:
+  django-media:
+  django-locale:
+  django-static:

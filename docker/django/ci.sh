@@ -54,8 +54,15 @@ run_ci () {
   # Run checks to be sure settings are correct (production flag is required):
   DJANGO_ENV=production python manage.py check --deploy --fail-level WARNING
 
-  # Check that staticfiles app is working fine:
+  # Run checks to be sure settings are correct (staging flag is required):
+  DJANGO_ENV=staging python manage.py check --deploy --fail-level WARNING
+
+  # PRODUCTION - Check that staticfiles app is working fine:
   DJANGO_ENV=production DJANGO_COLLECTSTATIC_DRYRUN=1 \
+    python manage.py collectstatic --no-input --dry-run
+
+  # STAGING - Check that staticfiles app is working fine:
+  DJANGO_ENV=staging DJANGO_COLLECTSTATIC_DRYRUN=1 \
     python manage.py collectstatic --no-input --dry-run
 
   # Check that all migrations worked fine:

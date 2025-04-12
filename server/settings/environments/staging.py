@@ -6,6 +6,9 @@ values are overridden.
 """
 
 from server.settings.components import config
+from server.settings.components.common import (
+    SPECTACULAR_SETTINGS as SPECTACULAR_SETTINGS_BASE,
+)
 from server.settings.components.csp import CSP_CONNECT_SRC
 
 # Production flags:
@@ -84,3 +87,8 @@ CSP_CONNECT_SRC += (
     "'self'",
     config("DOMAIN_NAME", default=""),
 )
+
+SPECTACULAR_SETTINGS = SPECTACULAR_SETTINGS_BASE.copy()  # noqa: E0602
+SPECTACULAR_SETTINGS["SERVERS"] = [
+    {"url": config("DOMAIN_NAME", default=""), "description": "Staging server"},
+]

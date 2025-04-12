@@ -80,7 +80,7 @@ RUN --mount=type=cache,target="$POETRY_CACHE_DIR" \
   echo "$DJANGO_ENV" \
   && poetry --version && poetry run pip --version \
   && poetry sync \
-    $(if [ "$DJANGO_ENV" = 'production' ]; then echo '--only main'; fi) \
+    $(if [ "$DJANGO_ENV" = 'production' -o "$DJANGO_ENV" = 'staging' ]; then echo '--only main'; fi) \
     --no-interaction --no-ansi --compile
 
 # This is a special case. We need to run this script as an entry point:
@@ -98,7 +98,7 @@ USER web
 ENTRYPOINT ["tini", "--", "/docker-entrypoint.sh"]
 
 
-# The following stage is only for production:
+# The following stage is only for production and staging environments:
 # https://wemake-django-template.readthedocs.io/en/latest/pages/template/production.html
 FROM development_build AS production_build
 COPY --chown=web:web . /code
