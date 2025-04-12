@@ -12,7 +12,12 @@ Docs: https://github.com/mozilla/django-csp
 CSP_SCRIPT_SRC: tuple[str, ...] = ("'self'", "'unsafe-inline'", "cdn.jsdelivr.net")
 CSP_IMG_SRC: tuple[str, ...] = ("'self'", "data:", "cdn.jsdelivr.net")
 CSP_FONT_SRC: tuple[str, ...] = ("'self'",)
-CSP_STYLE_SRC: tuple[str, ...] = ("'self'", "'unsafe-inline'", "cdn.jsdelivr.net")
+CSP_STYLE_SRC: tuple[str, ...] = (
+    "'self'",
+    "'unsafe-inline'",
+    "cdn.jsdelivr.net",
+    "fonts.googleapis.com",
+)
 # CSP_DEFAULT_SRC: tuple[str, ...] = ("'none'",)
 CSP_CONNECT_SRC: tuple[str, ...] = ()
 CSP_DEFAULT_SRC: tuple[str, ...] = ("'self'", "'unsafe-inline'", "cdn.jsdelivr.net")
