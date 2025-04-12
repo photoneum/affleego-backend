@@ -13,6 +13,9 @@ from typing import TYPE_CHECKING
 from server.settings.components import config
 from server.settings.components.common import DATABASES, INSTALLED_APPS, MIDDLEWARE
 from server.settings.components.csp import CSP_CONNECT_SRC, CSP_IMG_SRC, CSP_SCRIPT_SRC
+from server.settings.components.common import (
+    SPECTACULAR_SETTINGS as SPECTACULAR_SETTINGS_BASE,
+)
 
 if TYPE_CHECKING:
     from django.http import HttpRequest
@@ -157,3 +160,22 @@ EXTRA_CHECKS = {
 # Disable persistent DB connections
 # https://docs.djangoproject.com/en/4.2/ref/databases/#caveats
 DATABASES["default"]["CONN_MAX_AGE"] = 0
+
+
+# CSP
+CSP_CONNECT_SRC += (
+    "'self'",
+    config("DOMAIN_NAME", default=""),
+)
+
+SPECTACULAR_SETTINGS = SPECTACULAR_SETTINGS_BASE.copy()  # noqa: E0602
+SPECTACULAR_SETTINGS["SERVERS"] = [
+    {"url": config("DOMAIN_NAME", default=""), "description": "Staging server"},
+]
+
+# Email
+# https://docs.djangoproject.com/en/4.2/topics/email/
+# -------------------------------------------------------------------------------
+EMAIL_HOST = config("EMAIL_HOST", default="")
+EMAIL_PORT = 1025
+EMAIL_USE_TLS = config("EMAIL_USE_TLS", default=False)

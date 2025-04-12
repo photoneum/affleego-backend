@@ -1,0 +1,22 @@
+---
+# This compose-file starts mailhog service.
+# It is used for development or staging purposes.
+
+version: "3"
+
+services:
+  mailhog:
+    image: mailhog/mailhog
+    container_name: mailhog-standalone
+    ports:
+      - "1025:1025" # SMTP port
+      - "8025:8025" # Web UI port
+    restart: always
+    networks:
+      - mailhog-standalone-net
+    labels:
+      - "com.docker.compose.project=mailhog-standalone" # Custom project name
+
+networks:
+  mailhog-standalone-net:
+    name: mailhog-standalone-net # Explicit name for the network

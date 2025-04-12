@@ -349,3 +349,11 @@ SPECTACULAR_SETTINGS = {
     "COMPONENT_SPLIT_REQUEST": True,
     "SERVE_PERMISSIONS": ["rest_framework.permissions.AllowAny"],
 }
+
+# Email
+# https://docs.djangoproject.com/en/4.2/topics/email/
+# -------------------------------------------------------------------------------
+DEFAULT_FROM_EMAIL = config(
+    "DEFAULT_FROM_EMAIL",
+    default="Engine Sync Notifications <noreply@enginesync.com>",
+)

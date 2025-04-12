@@ -92,3 +92,10 @@ SPECTACULAR_SETTINGS = SPECTACULAR_SETTINGS_BASE.copy()  # noqa: E0602
 SPECTACULAR_SETTINGS["SERVERS"] = [
     {"url": config("DOMAIN_NAME", default=""), "description": "Staging server"},
 ]
+
+# Email
+# https://docs.djangoproject.com/en/4.2/topics/email/
+# -------------------------------------------------------------------------------
+EMAIL_HOST = config("EMAIL_HOST", default="")
+EMAIL_PORT = 1025
+EMAIL_USE_TLS = config("EMAIL_USE_TLS", default=False)

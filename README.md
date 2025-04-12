@@ -1,7 +1,7 @@
 # django-template-boilerplate
 
 Django Template
-This project was generated with [`wemake-django-template`](https://github.com/wemake-services/wemake-django-template), but modified by Emmanuel Anebi, to use Nginx over Caddy for request proxy and other suitable configurations. 
+This project was generated with [`wemake-django-template`](https://github.com/wemake-services/wemake-django-template), but modified by Emmanuel Anebi, to use Nginx over Caddy for request proxy and other suitable configurations.
 
 Current template version is: [bc12b3d](https://github.com/wemake-services/wemake-django-template/tree/bc12b3d15dc90f8e5b2e42b22bab2d1ef5251a55). See what is [updated](https://github.com/wemake-services/wemake-django-template/compare/bc12b3d15dc90f8e5b2e42b22bab2d1ef5251a55...master) since then.
 
@@ -31,3 +31,11 @@ When developing locally, we use:
 ## Documentation
 
 Full documentation is available here: [`docs/`](docs).
+
+### Mailhog
+
+Mailhog is a simple SMTP server that captures emails sent from the application.
+
+To start mailhog, run `docker compose -f docker-compose.mailhog.yml -p mailhog-standalone up -d`.
+
+To stop mailhog, run `docker compose -f docker-compose.mailhog.yml -p mailhog-standalone down`.
