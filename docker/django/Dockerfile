@@ -4,8 +4,8 @@
 
 FROM python:3.12.7-slim-bookworm AS development_build
 
-LABEL maintainer="api.enginesync.com"
-LABEL vendor="api.enginesync.com"
+LABEL maintainer="api.affleego.com"
+LABEL vendor="api.affleego.com"
 
 # `DJANGO_ENV` arg is used to make prod / dev builds:
 ARG DJANGO_ENV \
@@ -68,8 +68,8 @@ RUN groupadd -g "${GID}" -r web \
   && useradd -d '/code' -g web -l -r -u "${UID}" web \
   && chown web:web -R '/code' \
   # Static and media files:
-  && mkdir -p '/var/www/django/static' '/var/www/django/media' \
-  && chown web:web '/var/www/django/static' '/var/www/django/media'
+  && mkdir -p '/var/www/affleego/django/static' '/var/www/affleego/django/media' \
+  && chown web:web '/var/www/affleego/django/static' '/var/www/affleego/django/media'
 
 # Copy only requirements, to cache them in docker layer:
 COPY --chown=web:web ./poetry.lock ./pyproject.toml /code/

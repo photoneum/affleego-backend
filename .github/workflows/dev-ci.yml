@@ -33,7 +33,7 @@ jobs:
           key: ${{ secrets.SERVER_SSH_KEY }}
           port: 22
           source: "."
-          target: "~/engine-sync-backend"
+          target: "~/affleego-backend"
 
       - name: Build and Deploy the Stack
         uses: appleboy/ssh-action@master
@@ -43,7 +43,7 @@ jobs:
           key: ${{ secrets.SERVER_SSH_KEY }}
           port: 22
           script: |
-            cd ~/engine-sync-backend
+            cd ~/affleego-backend
             docker compose -f docker-compose.yml -f docker-compose.staging.yml down
             docker compose -f docker-compose.yml -f docker-compose.staging.yml build
             docker compose -f docker-compose.yml -f docker-compose.staging.yml up -d  --no-deps --build --force-recreate --remove-orphans

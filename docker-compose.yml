@@ -20,7 +20,7 @@ services:
   web:
     <<: &web
       # Image name is changed in production:
-      image: "engine-sync-backend:dev"
+      image: "affleego-backend:dev"
       build:
         target: development_build
         context: .
@@ -28,12 +28,12 @@ services:
         args:
           DJANGO_ENV: development
         cache_from:
-          - "engine-sync-backend:dev"
-          - "engine-sync-backend:latest"
+          - "affleego-backend:dev"
+          - "affleego-backend:latest"
           - "*"
 
       volumes:
-        - django-static:/var/www/django/static
+        - django-static:/var/www/affleego/django/static
       depends_on:
         - db
       networks:

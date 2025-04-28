@@ -37,7 +37,9 @@ _COLLECTSTATIC_DRYRUN = config(
     default=False,
 )
 # Adding STATIC_ROOT to collect static files via 'collectstatic':
-STATIC_ROOT = '.static' if _COLLECTSTATIC_DRYRUN else '/var/www/django/static'
+STATIC_ROOT = (
+    '.static' if _COLLECTSTATIC_DRYRUN else '/var/www/affleego/django/static'
+)
 
 # TODO: convert to `STORAGES`
 STATICFILES_STORAGE = (
@@ -50,7 +52,7 @@ STATICFILES_STORAGE = (
 # Media files
 # https://docs.djangoproject.com/en/4.2/topics/files/
 
-MEDIA_ROOT = '/var/www/django/media'
+MEDIA_ROOT = '/var/www/affleego/django/media'
 
 
 # Password validation

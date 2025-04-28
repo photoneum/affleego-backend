@@ -362,5 +362,5 @@ SPECTACULAR_SETTINGS = {
 # -------------------------------------------------------------------------------
 DEFAULT_FROM_EMAIL = config(
     'DEFAULT_FROM_EMAIL',
-    default='Engine Sync Notifications <noreply@enginesync.com>',
+    default='Affleego <noreply@affleego.com>',
 )
