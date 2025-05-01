@@ -1054,6 +1054,18 @@ python-jose = ["python-jose (==3.3.0)"]
 test = ["cryptography", "freezegun", "pytest", "pytest-cov", "pytest-django", "pytest-xdist", "tox"]
 
 [[package]]
+name = "djangorestframework-types"
+version = "0.9.0"
+description = "Type stubs for Django Rest Framework"
+optional = false
+python-versions = "<4.0,>=3.8"
+groups = ["main"]
+files = [
+    {file = "djangorestframework_types-0.9.0-py3-none-any.whl", hash = "sha256:5e4258fe43774d0a3d018780170bd702bf615407fe244453ea5ec6e6676b98c4"},
+    {file = "djangorestframework_types-0.9.0.tar.gz", hash = "sha256:aa6b27fbdab5ff4ab1dfa5376f3b6ec45713ce48dbcdd4226bf3e1410f0deaca"},
+]
+
+[[package]]
 name = "djlint"
 version = "1.36.4"
 description = "HTML Template Linter and Formatter"
@@ -3813,4 +3825,4 @@ dev = ["doc8", "flake8", "flake8-import-order", "rstcheck[sphinx]", "sphinx"]
 [metadata]
 lock-version = "2.1"
 python-versions = ">3.12,<3.13"
-content-hash = "4c76c97e1bea1f5fd4ae10adae5e3c3fbd19816e300739864b45ae8e1f26f9d7"
+content-hash = "a04a7ee815cf2391c06115627193536c81ba0cd73064ae7e6f7a958024e51682"

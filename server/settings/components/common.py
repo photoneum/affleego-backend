@@ -216,13 +216,13 @@ EMAIL_TIMEOUT = 5
 # Jazzmin
 JAZZMIN_SETTINGS = {
     # title of the window (Will default to current_admin_site.site_title if absent or None)
-    'site_title': 'Engine Sync Admin',
+    'site_title': 'Affleego Admin',
     # Title on the login screen (19 chars max) (defaults to
     # current_admin_site.site_header if absent or None)
-    'site_header': 'Engine Sync',
+    'site_header': 'Affleego',
     # Title on the brand (19 chars max) (defaults to current_admin_site.site_header
     # if absent or None)
-    'site_brand': 'Engine Sync',
+    'site_brand': 'Affleego',
     # Logo to use for your site, must be present in static files, used for brand on top left
     # "site_logo": "books/img/logo.png",  # noqa: ERA001
     'site_logo': None,
@@ -237,9 +237,9 @@ JAZZMIN_SETTINGS = {
     # (ideally 32x32 px)
     'site_icon': None,
     # Welcome text on the login screen
-    'welcome_sign': 'Welcome to the Engine Sync',
+    'welcome_sign': 'Welcome to the Affleego',
     # Copyright on the footer
-    'copyright': 'Engine Sync',
+    'copyright': 'Affleego',
     # List of model admins to search from the search bar, search bar omitted if excluded
     # If you want to use a single search field you dont need to use a list, you can use
     # a simple string
@@ -358,8 +358,8 @@ REST_FRAMEWORK = {
 }
 
 SPECTACULAR_SETTINGS = {
-    'TITLE': 'Engine Sync API',
-    'DESCRIPTION': 'Engine Sync API',
+    'TITLE': 'Affleego API',
+    'DESCRIPTION': 'Affleego API',
     'VERSION': '1.0.0',
     'SERVE_INCLUDE_SCHEMA': False,
     'COMPONENT_SPLIT_REQUEST': True,
