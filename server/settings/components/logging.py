@@ -80,8 +80,7 @@ class LoggingContextVarsMiddleware:
         self.get_response = get_response
 
     def __call__(self, request: HttpRequest) -> HttpResponse:
-        """
-        Handle requests.
+        """Handle requests.
 
         Add your logging metadata here.
         Example: https://github.com/jrobichaud/django-structlog

@@ -1,5 +1,4 @@
-"""
-This file contains all the settings used in production.
+"""This file contains all the settings used in production.
 
 This file is required and if development.py is present these
 values are overridden.
@@ -13,11 +12,11 @@ from server.settings.components.csp import CSP_CONNECT_SRC
 
 DEBUG = False
 
-HOSTS = config('ALLOWED_HOSTS', default='')
+HOSTS: list[str] = config('ALLOWED_HOSTS', default='').split(',')  # type: ignore
 
 ALLOWED_HOSTS = [
     # Split the domains by comma and filter out empty strings
-    *[host.strip() for host in HOSTS.split(',') if host.strip()],
+    *[host.strip() for host in HOSTS.split(',') if host.strip()],  # type: ignore
     # We need this value for `healthcheck` to work:
     'localhost',
 ]
@@ -34,17 +33,16 @@ _COLLECTSTATIC_DRYRUN = config(
     default=False,
 )
 # Adding STATIC_ROOT to collect static files via 'collectstatic':
-STATIC_ROOT = (
-    '.static' if _COLLECTSTATIC_DRYRUN else '/var/www/affleego/django/static'
-)
+STATIC_ROOT = '.static' if _COLLECTSTATIC_DRYRUN else '/var/www/affleego/django/static'
 
-# TODO: convert to `STORAGES`
-STATICFILES_STORAGE = (
-    # This is a string, not a tuple,
-    # but it does not fit into 80 characters rule.
-    'django.contrib.staticfiles.storage.ManifestStaticFilesStorage'
-)
-
+STORAGES = {
+    'default': {
+        'BACKEND': 'django.core.files.storage.FileSystemStorage',
+    },
+    'staticfiles': {
+        'BACKEND': 'django.core.files.storage.ManifestStaticFilesStorage',
+    },
+}
 
 # Media files
 # https://docs.djangoproject.com/en/4.2/topics/files/
@@ -82,7 +80,7 @@ SESSION_COOKIE_SECURE = True
 CSRF_COOKIE_SECURE = True
 
 # CSP
-CSP_CONNECT_SRC += (
+CSP_CONNECT_SRC += (  # type: ignore
     "'self'",
     config('DOMAIN_NAME', default=''),
 )

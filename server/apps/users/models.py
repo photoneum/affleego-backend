@@ -1,15 +1,56 @@
+import textwrap
+from typing import ClassVar, final, override
+
 from django.contrib.auth.models import AbstractUser
 from django.db import models
+from django.utils.translation import gettext_lazy as _
+
+from server.common.mixins import UUIDMixin
+
 
 # # Create your models here.
-# class User(AbstractUser):
-#     pass
+@final
+class User(AbstractUser, UUIDMixin):
+    """User model."""
 
+    class Type(models.TextChoices):
+        """User type choices."""
 
-# class UserProfile(models.Model):
-#     user = models.OneToOneField(User, on_delete=models.CASCADE)
-#     profile_picture = models.ImageField(
-#         upload_to="profile-pictures/", null=True, blank=True
-#     )
-#     bio = models.TextField(blank=True)
-#     location = models.CharField(max_length=100, blank=True)
+        ADMIN = 'admin', 'Admin'
+        USER = 'user', 'User'
+
+    email = models.EmailField(_('email address'), unique=True)
+    phone_number = models.CharField(_('phone number'), blank=True, max_length=20)
+    image = models.ImageField(_('image'), upload_to='users/', null=True, blank=True)
+    is_verified = models.BooleanField(
+        _('verified'),
+        default=False,
+        help_text=_('Designates whether this user has verified their accounts.'),
+    )
+    type = models.CharField(
+        _('type'),
+        max_length=10,
+        choices=Type.choices,
+        default=Type.USER,
+    )
+
+    USERNAME_FIELD = 'email'
+    REQUIRED_FIELDS: ClassVar[list[str]] = ['first_name', 'last_name']
+
+    class Meta:
+        verbose_name = 'User'
+        verbose_name_plural = 'Users'
+        constraints = [
+            models.CheckConstraint(
+                name='users_user_type_valid',
+                condition=models.Q(type__in=['admin', 'user']),  # type: ignore
+            ),
+        ]
+
+    @override
+    def __str__(self):
+        return textwrap.wrap(self.username, 40)[0]
+
+    @property
+    def full_name(self):
+        return self.get_full_name()
