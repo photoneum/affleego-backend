@@ -69,6 +69,8 @@ MIDDLEWARE: tuple[str, ...] = (
     'django.contrib.auth.middleware.AuthenticationMiddleware',
     'django.contrib.messages.middleware.MessageMiddleware',
     'django.middleware.clickjacking.XFrameOptionsMiddleware',
+    'server.common.middleware.http.StandardResponseMiddleware',
+    'server.common.middleware.http.ErrorHandlingMiddleware',
     # Axes:
     'axes.middleware.AxesMiddleware',
 )
@@ -355,6 +357,8 @@ REST_FRAMEWORK = {
         'rest_framework.permissions.DjangoModelPermissionsOrAnonReadOnly',
     ],
     'DEFAULT_SCHEMA_CLASS': 'drf_spectacular.openapi.AutoSchema',
+    # Custom exception handler
+    'EXCEPTION_HANDLER': 'server.common.exception_handler.custom_exception_handler',
 }
 
 SPECTACULAR_SETTINGS = {

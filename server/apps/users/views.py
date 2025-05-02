@@ -14,6 +14,7 @@ from server.apps.users.logic.serializers import (
     UserOnboardingSerializer,
     UserRegistrationSerializer,
 )
+from server.common.api_response import ApiResponse
 
 User = get_user_model()
 
@@ -31,11 +32,10 @@ class AuthViewSet(viewsets.GenericViewSet):
     @action(detail=False, methods=['post'])
     def register(self, request: Request) -> Response:
         serializer = UserRegistrationSerializer(data=request.data)
-        if serializer.is_valid():
-            serializer.save()
-            # TODO: Send verification email
-            return Response(serializer.data, status=status.HTTP_201_CREATED)
-        return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
+        serializer.is_valid(raise_exception=True)
+        serializer.save()
+        # TODO: Send verification email
+        return ApiResponse(serializer.data, status=status.HTTP_201_CREATED)
 
     @extend_schema(
         request=UserOnboardingSerializer,
