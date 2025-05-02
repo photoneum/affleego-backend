@@ -20,8 +20,8 @@ from drf_spectacular.views import (
 )
 from health_check import urls as health_urls
 
-# from server.apps.main import urls as main_urls  # noqa: ERA001
 from server.apps.main.views import index
+from server.apps.users import urls as users_urls
 
 admin.autodiscover()
 
@@ -45,7 +45,10 @@ urlpatterns = [
         name='redoc',
     ),
     # Apps:
-    # path("main/", include(main_urls, namespace="main")),  # noqa: ERA001
+    path(
+        f'{API_PREFIX}/{API_VERSION}/',
+        include(users_urls, namespace='users'),
+    ),
     # Health checks:
     path('health/', include(health_urls)),
     # django-admin:
