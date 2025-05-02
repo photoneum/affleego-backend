@@ -86,14 +86,14 @@ server {
 
     # Django static files
     location /static/ {
-        alias /var/www/django/static/;
+        alias /var/www/affleego/django/static/;
         expires 30d;
         add_header Cache-Control "public, max-age=2592000";
     }
 
     # Django media files
     location /media/ {
-        alias /var/www/django/media/;
+        alias /var/www/affleego/django/media/;
         expires 30d;
         add_header Cache-Control "public, max-age=2592000";
     }
@@ -126,7 +126,7 @@ The Docker Compose setup orchestrates the containers:
 services:
   web:
     <<: &web # Image for production:
-      image: "engine-sync-backend:prod"
+      image: "affleego-backend:prod"
       build:
         target: production_build
         context: .
@@ -136,7 +136,7 @@ services:
 
       restart: unless-stopped
       volumes:
-        - django-media:/var/www/django/media
+        - django-media:/var/www/affleego/django/media
         - django-locale:/code/locale
 
     command: bash ./docker/django/gunicorn.sh
@@ -151,8 +151,8 @@ services:
     volumes:
       - ./docker/nginx/nginx.conf:/etc/nginx/conf.d/default.conf
       - ./docker/nginx/ci.sh:/etc/ci.sh
-      - django-static:/var/www/django/static
-      - django-media:/var/www/django/media
+      - django-static:/var/www/affleego/django/static
+      - django-media:/var/www/affleego/django/media
     depends_on:
       - web
     networks:
@@ -190,13 +190,13 @@ volumes:
 
 - **Static files** (CSS, JS, etc.):
   - Stored in a Docker volume (`django-static`)
-  - Served directly by Docker Nginx from `/var/www/django/static/`
+  - Served directly by Docker Nginx from `/var/www/affleego/django/static/`
   - Cache headers set to 30 days for better performance
 
 - **Media files** (user uploads, etc.):
   - Stored in a Docker volume (`django-media`)
   - Shared between Django (for writing) and Nginx (for serving)
-  - Served directly by Docker Nginx from `/var/www/django/media/`
+  - Served directly by Docker Nginx from `/var/www/affleego/django/media/`
   - Cache headers set to 30 days
 
 ## Security Considerations

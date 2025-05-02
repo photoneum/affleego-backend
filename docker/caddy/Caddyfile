@@ -48,7 +48,7 @@ www.{$DOMAIN_NAME} {
 	# Serve static files
 	handle_path /static/* {
 		# STATIC_ROOT
-		root * /var/www/django/static
+		root * /var/www/affleego/django/static
 
 		file_server {
 			# Staticfiles are pre-compressed in `gunicorn.sh`
@@ -59,7 +59,7 @@ www.{$DOMAIN_NAME} {
 	# Serve media files
 	handle_path /media/* {
 		# MEDIA_ROOT
-		root * /var/www/django/media
+		root * /var/www/affleego/django/media
 
 		file_server
 	}

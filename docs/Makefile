@@ -4,7 +4,7 @@
 # You can set these variables from the command line.
 SPHINXOPTS=-W
 SPHINXBUILD=python -msphinx
-SPHINXPROJ=engine-sync-backend
+SPHINXPROJ=affleego-backend
 SOURCEDIR=.
 BUILDDIR=_build
 

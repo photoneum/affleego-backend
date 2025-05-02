@@ -1,5 +1,4 @@
-"""
-This file contains all the settings used in production.
+"""This file contains all the settings used in production.
 
 This file is required and if development.py is present these
 values are overridden.
@@ -37,20 +36,23 @@ _COLLECTSTATIC_DRYRUN = config(
     default=False,
 )
 # Adding STATIC_ROOT to collect static files via 'collectstatic':
-STATIC_ROOT = '.static' if _COLLECTSTATIC_DRYRUN else '/var/www/django/static'
+STATIC_ROOT = '.static' if _COLLECTSTATIC_DRYRUN else '/var/www/affleego/django/static'
 
 # TODO: convert to `STORAGES`
-STATICFILES_STORAGE = (
-    # This is a string, not a tuple,
-    # but it does not fit into 80 characters rule.
-    'django.contrib.staticfiles.storage.ManifestStaticFilesStorage'
-)
+STORAGES = {
+    'default': {
+        'BACKEND': 'django.core.files.storage.FileSystemStorage',
+    },
+    'staticfiles': {
+        'BACKEND': 'django.contrib.staticfiles.storage.ManifestStaticFilesStorage',
+    },
+}
 
 
 # Media files
 # https://docs.djangoproject.com/en/4.2/topics/files/
 
-MEDIA_ROOT = '/var/www/django/media'
+MEDIA_ROOT = '/var/www/affleego/django/media'
 
 
 # Password validation

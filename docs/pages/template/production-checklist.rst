@@ -58,9 +58,9 @@ It is bundled into ``docker``, so the container will not work with any warnings.
 Static and media files
 ~~~~~~~~~~~~~~~~~~~~~~
 
-We use ``/var/www/django`` folder to store our media
-and static files in production as ``/var/www/django/static``
-and ``/var/www/django/media``.
+We use ``/var/www/affleego/django`` folder to store our media
+and static files in production as ``/var/www/affleego/django/static``
+and ``/var/www/affleego/django/media``.
 Docker uses these two folders as named volumes.
 And later these volumes are also mounted to ``caddy``
 with ``ro`` mode so it possible to read their contents.

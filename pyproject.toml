@@ -1,6 +1,6 @@
 [project]
 authors = [{ name = "Emmanuel Anebi", email = "anebiemmanuel@gmail.com" }]
-name = "engine-sync-backend"
+name = "affleego-backend"
 description = "Engine Sync"
 version = "0.1.0"
 requires-python = ">3.12,<3.13"
@@ -42,6 +42,10 @@ djangorestframework-simplejwt = "^5.5.0"
 django-rest-passwordreset = "^1.5.0"
 djangorestframework-camel-case = "^1.4.2"
 django-cors-headers = "^4.7.0"
+pillow = "^11.2.1"
+pylint-django = "^2.6.1"
+django-types = "^0.20.0"
+djangorestframework-types = "^0.9.0"
 
 
 [tool.poetry.group.dev.dependencies]
@@ -97,80 +101,6 @@ profile = "django"
 max_line_length = 80
 format_attribute_template_tags = true
 
-
-[tool.ruff]
-# Ruff config: https://docs.astral.sh/ruff/settings
-preview = true
-fix = true
-target-version = "py312"
-line-length = 80
-
-[tool.ruff.format]
-quote-style = "single"
-docstring-code-format = false
-
-[tool.ruff.lint]
-select = [
-  "A",    # flake8-builtins
-  "B",    # flake8-bugbear
-  "C4",   # flake8-comprehensions
-  "C90",  # maccabe
-  "COM",  # flake8-commas
-  "D",    # pydocstyle
-  "DTZ",  # flake8-datetimez
-  "E",    # pycodestyle
-  "ERA",  # flake8-eradicate
-  "EXE",  # flake8-executable
-  "F",    # pyflakes
-  "FBT",  # flake8-boolean-trap
-  "FLY",  # pyflint
-  "FURB", # refurb
-  "G",    # flake8-logging-format
-  "I",    # isort
-  "ICN",  # flake8-import-conventions
-  "ISC",  # flake8-implicit-str-concat
-  "LOG",  # flake8-logging
-  "N",    # pep8-naming
-  "PERF", # perflint
-  "PIE",  # flake8-pie
-  "PL",   # pylint
-  "PT",   # flake8-pytest-style
-  "PTH",  # flake8-use-pathlib
-  "Q",    # flake8-quotes
-  "RET",  # flake8-return
-  "RSE",  # flake8-raise
-  "RUF",  # ruff
-  "S",    # flake8-bandit
-  "SIM",  # flake8-simpify
-  "SLF",  # flake8-self
-  "SLOT", # flake8-slots
-  "T100", # flake8-debugger
-  "TRY",  # tryceratops
-  "UP",   # pyupgrade
-  "W",    # pycodestyle
-  "YTT",  # flake8-2020
-]
-ignore = [
-  "A005",   # allow to shadow stdlib and builtin module names
-  "COM812", # trailing comma, conflicts with `ruff format`
-  # Different doc rules that we don't really care about:
-  "D100",
-  "D104",
-  "D106",
-  "D203",
-  "D212",
-  "D401",
-  "D404",
-  "D405",
-  "ISC001",  # implicit string concat conflicts with `ruff format`
-  "ISC003",  # prefer explicit string concat over implicit concat
-  "PLR09",   # we have our own complexity rules
-  "PLR2004", # do not report magic numbers
-  "PLR6301", # do not require classmethod / staticmethod when self not used
-  "TRY003",  # long exception messages from `tryceratops`
-]
-external = ["WPS"]
-
 # Plugin configs:
 flake8-import-conventions.banned-from = ["ast"]
 flake8-quotes.inline-quotes = "single"
@@ -181,3 +111,18 @@ pydocstyle.convention = "google"
 "server/apps/*/migrations/*.py" = ["D101", "E501", "RUF012"]
 "server/common/typing/*.py" = ["F401"]
 "tests/*.py" = ["S101"]
+
+
+[tool.pyright]
+include = ["."]
+exclude = ["**/node_modules", "**/__pycache__", "**/.venv", "**/.git"]
+pythonVersion = "3.12"
+typeCheckingMode = "basic"
+reportMissingImports = "warning"
+reportMissingTypeStubs = "warning"
+reportUnknownParameterType = "warning"
+reportUnknownArgumentType = "warning"
+reportUnknownVariableType = "warning"
+reportUnknownMemberType = "warning"
+reportMissingTypeArgument = "warning"
+reportInvalidTypeVarUse = "warning"
