@@ -46,10 +46,9 @@ class AuthViewSet(viewsets.GenericViewSet):
     @action(detail=False, methods=['post'], permission_classes=[IsAuthenticated])
     def onboarding(self, request: Request) -> Response:
         serializer = UserOnboardingSerializer(data=request.data)
-        if serializer.is_valid():
-            # TODO: Save onboarding data to user profile or related model
-            return Response(serializer.data, status=status.HTTP_200_OK)
-        return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
+        serializer.is_valid(raise_exception=True)
+        # TODO: Save onboarding data to user profile or related model
+        return ApiResponse(serializer.data, status=status.HTTP_200_OK)
 
 
 @extend_schema(tags=['Authentication'])

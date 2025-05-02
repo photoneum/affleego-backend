@@ -1,6 +1,7 @@
-# server/common/middleware.py
 import json
+import traceback
 
+from django.conf import settings
 from django.http import HttpRequest, JsonResponse
 from rest_framework.exceptions import APIException
 
@@ -125,11 +126,17 @@ class ErrorHandlingMiddleware:
             status_code = 500
             detail = str(exception)
 
-        # Include stack trace in development, but not in production
-        # TODO: Add stack trace in development
-        error_data = {
-            'detail': detail,
-        }
+            # Include stack trace in development, but not in production
+            if settings.DEBUG:  # Check if the application is in development mode
+                stack_trace = traceback.format_exc()
+                error_data = {
+                    'detail': detail,
+                    'stack_trace': stack_trace,
+                }
+            else:
+                error_data = {
+                    'detail': detail,
+                }
 
         # Get the user-friendly message
         message = self._get_user_friendly_message(status_code)
