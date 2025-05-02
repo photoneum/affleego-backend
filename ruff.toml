@@ -71,6 +71,9 @@ ignore = [
   "TRY003",  # long exception messages from `tryceratops`
   "RUF012",  # ignore `RUF012` for `django-stubs-ext`
   "D102",    # ignore `D102` for `django-stubs-ext`
+  "D417",
+  "B026",
+  "D107",
 ]
 
 external = ["WPS"]

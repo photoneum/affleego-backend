@@ -5,6 +5,7 @@ from django.contrib.auth.models import AbstractUser
 from django.db import models
 from django.utils.translation import gettext_lazy as _
 
+from server.apps.users.managers import UserManager
 from server.common.mixins import UUIDMixin
 
 
@@ -33,9 +34,9 @@ class User(AbstractUser, UUIDMixin):
         choices=Type.choices,
         default=Type.USER,
     )
-
     USERNAME_FIELD = 'email'
     REQUIRED_FIELDS: ClassVar[list[str]] = ['first_name', 'last_name']
+    objects = UserManager()  # type: ignore
 
     class Meta:
         verbose_name = 'User'
