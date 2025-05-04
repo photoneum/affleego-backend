@@ -1,13 +1,19 @@
+import secrets
 import textwrap
-from typing import ClassVar, final, override
+from datetime import timedelta
+from typing import TYPE_CHECKING, ClassVar, final, override
 
 from django.contrib.auth.models import AbstractUser
 from django.db import models
+from django.utils import timezone
 from django.utils.translation import gettext_lazy as _
 
 from server.apps.users.managers import UserManager
 from server.common.mixins import UUIDMixin
 from server.common.utils.file_url_helpers import get_full_url
+
+if TYPE_CHECKING:
+    from django.db.models.manager import RelatedManager
 
 
 # # Create your models here.
@@ -20,6 +26,9 @@ class User(AbstractUser, UUIDMixin):
 
         ADMIN = 'admin', 'Admin'
         USER = 'user', 'User'
+
+    if TYPE_CHECKING:
+        verification_codes = RelatedManager['VerificationCode']()
 
     id: int
     email = models.EmailField(_('email address'), unique=True)
@@ -63,3 +72,62 @@ class User(AbstractUser, UUIDMixin):
         if self.image:
             return get_full_url(self.image.url)
         return None
+
+
+# Add this new model for verification codes
+@final
+class VerificationCode(models.Model):
+    """Model for storing verification codes."""
+
+    # if TYPE_CHECKING:
+    #     user = ForeignKey[User]
+
+    user = models.ForeignKey(
+        User,
+        on_delete=models.CASCADE,
+        related_name='verification_codes',
+        verbose_name=_('user'),
+    )
+    code = models.CharField(
+        _('verification code'),
+        max_length=6,
+        unique=True,
+    )
+    created_at = models.DateTimeField(
+        _('created at'),
+        auto_now_add=True,
+    )
+    expires_at = models.DateTimeField(
+        _('expires at'),
+    )
+    is_used = models.BooleanField(
+        _('is used'),
+        default=False,
+    )
+
+    class Meta:
+        verbose_name = _('Verification Code')
+        verbose_name_plural = _('Verification Codes')
+
+    def __str__(self):
+        return f'Code for {self.user.email}'
+
+    def is_valid(self) -> bool:
+        """Check if the verification code is valid."""
+        return not self.is_used and self.expires_at > timezone.now()
+
+    @classmethod
+    def generate_code(cls, user: User, expiry_minutes: int = 10) -> 'VerificationCode':
+        """Generate a new verification code for the user."""
+        # Generate a random 6-digit code
+        code = ''.join([str(secrets.randbelow(10)) for _ in range(6)])
+
+        # Set expiry time
+        expires_at = timezone.now() + timedelta(minutes=expiry_minutes)
+
+        # Create and return the verification code
+        return cls.objects.create(
+            user=user,
+            code=code,
+            expires_at=expires_at,
+        )
