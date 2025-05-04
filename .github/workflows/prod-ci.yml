@@ -1,14 +1,14 @@
-name: Staging CI
+name: Production CI
 
 on:
   pull_request:
     branches:
-      - develop
+      - production
     paths-ignore: ["docs/**"]
 
   push:
     branches:
-      - develop
+      - production
     paths-ignore: ["docs/**"]
 
 concurrency:
@@ -18,7 +18,7 @@ concurrency:
 jobs:
   deploy:
     runs-on: ubuntu-latest
-    environment: development
+    environment: production
     if: ${{ github.event_name == 'push' }} # will be fired if the trigger event is a push event.
 
     steps:
@@ -44,6 +44,5 @@ jobs:
           port: 22
           script: |
             cd ~/affleego-backend
-            docker compose -f docker-compose.yml -f docker-compose.staging.yml down
-            docker compose -f docker-compose.yml -f docker-compose.staging.yml build
-            docker compose -f docker-compose.yml -f docker-compose.staging.yml up -d  --no-deps --build --force-recreate --remove-orphans
+            docker compose -f docker-compose.yml -f docker-compose.prod.yml down
+            docker compose -f docker-compose.yml -f docker-compose.prod.yml up -d  --no-deps --build --force-recreate --remove-orphans
