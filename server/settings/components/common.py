@@ -77,7 +77,7 @@ MIDDLEWARE: tuple[str, ...] = (
 
 ROOT_URLCONF = 'server.urls'
 
-# Enable automatic trailing slash redirection
+# Disable automatic trailing slash redirection
 # https://docs.djangoproject.com/en/4.2/ref/settings/#append-slash
 APPEND_SLASH = False
 
@@ -226,7 +226,7 @@ JAZZMIN_SETTINGS = {
     # if absent or None)
     'site_brand': 'Affleego',
     # Logo to use for your site, must be present in static files, used for brand on top left
-    # "site_logo": "books/img/logo.png",  # noqa: ERA001
+    # "site_logo": "books/img/logo.png",
     'site_logo': None,
     # Logo to use for your site, must be present in static files, used for login form logo (defaults
     # to site_logo)
@@ -338,7 +338,7 @@ JAZZMIN_SETTINGS = {
     ###############
     # Render out the change view as a single form, or in tabs, current options are
     # - single
-    # - horizontal_tabs (default)  # noqa: ERA001
+    # - horizontal_tabs (default)
     # - vertical_tabs
     # - collapsible
     # - carousel
@@ -381,6 +381,6 @@ DEFAULT_FROM_EMAIL = config(
 # Django Axes
 # https://django-axes.readthedocs.io/en/latest/4_configuration.html#configuring-caches
 
-# AXES_FAILURE_LIMIT = 2 # noqa: ERA001
-# # AXES_COOLOFF_TIME = timedelta(seconds=30)  # noqa: ERA001
-# AXES_COOLOFF_TIME = 0.0083 # noqa: ERA001
+# AXES_FAILURE_LIMIT = 2
+# # AXES_COOLOFF_TIME = timedelta(seconds=30)
+# AXES_COOLOFF_TIME = 0.0083
