@@ -33,7 +33,7 @@ INSTALLED_APPS: tuple[str, ...] = (
     'django.contrib.admin',
     'django.contrib.admindocs',
     # Security:
-    'axes',
+    # 'axes',
     # Health checks:
     # You may want to enable other checks as well,
     # see: https://github.com/KristianOellegaard/django-health-check
@@ -72,7 +72,7 @@ MIDDLEWARE: tuple[str, ...] = (
     'server.common.middleware.http.StandardResponseMiddleware',
     'server.common.middleware.http.ErrorHandlingMiddleware',
     # Axes:
-    'axes.middleware.AxesMiddleware',
+    # 'axes.middleware.AxesMiddleware',
 )
 
 ROOT_URLCONF = 'server.urls'
@@ -180,7 +180,7 @@ MEDIA_ROOT = BASE_DIR.joinpath('media')
 # https://docs.djangoproject.com/en/4.2/topics/auth/
 
 AUTHENTICATION_BACKENDS = (
-    'axes.backends.AxesBackend',
+    # 'axes.backends.AxesBackend',
     'django.contrib.auth.backends.ModelBackend',
 )
 
@@ -381,6 +381,6 @@ DEFAULT_FROM_EMAIL = config(
 # Django Axes
 # https://django-axes.readthedocs.io/en/latest/4_configuration.html#configuring-caches
 
-AXES_FAILURE_LIMIT = 2
-# AXES_COOLOFF_TIME = timedelta(seconds=30)  # noqa: ERA001
-AXES_COOLOFF_TIME = 0.0083
+# AXES_FAILURE_LIMIT = 2 # noqa: ERA001
+# # AXES_COOLOFF_TIME = timedelta(seconds=30)  # noqa: ERA001
+# AXES_COOLOFF_TIME = 0.0083 # noqa: ERA001

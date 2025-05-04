@@ -10,19 +10,11 @@ import socket
 from typing import TYPE_CHECKING
 
 from server.settings.components import config
-from server.settings.components.common import (
-    DATABASES,
-    INSTALLED_APPS,
-    MIDDLEWARE,
-)
+from server.settings.components.common import DATABASES, INSTALLED_APPS, MIDDLEWARE
 from server.settings.components.common import (
     SPECTACULAR_SETTINGS as SPECTACULAR_SETTINGS_BASE,
 )
-from server.settings.components.csp import (
-    CSP_CONNECT_SRC,
-    CSP_IMG_SRC,
-    CSP_SCRIPT_SRC,
-)
+from server.settings.components.csp import CSP_CONNECT_SRC, CSP_IMG_SRC, CSP_SCRIPT_SRC
 
 if TYPE_CHECKING:
     from django.http import HttpRequest
@@ -35,7 +27,7 @@ HOSTS = config('ALLOWED_HOSTS', default='')
 
 ALLOWED_HOSTS = [
     # Split the domains by comma and filter out empty strings
-    *[host.strip() for host in HOSTS.split(',') if host.strip()],
+    *[host.strip() for host in HOSTS.split(',') if host.strip()],  # type: ignore
     'localhost',
     '0.0.0.0',  # noqa: S104
     '127.0.0.1',
@@ -89,7 +81,7 @@ INTERNAL_IPS += ['127.0.0.1', '10.0.2.2']
 
 def _custom_show_toolbar(request: HttpRequest) -> bool:
     """Only show the debug toolbar to users with the superuser flag."""
-    return DEBUG and request.user.is_superuser
+    return DEBUG and request.user.is_superuser  # type: ignore
 
 
 DEBUG_TOOLBAR_CONFIG = {
