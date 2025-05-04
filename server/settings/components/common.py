@@ -375,7 +375,7 @@ SPECTACULAR_SETTINGS = {
 # -------------------------------------------------------------------------------
 DEFAULT_FROM_EMAIL = config(
     'DEFAULT_FROM_EMAIL',
-    default='Affleego <noreply@affleego.com>',
+    default='Affleego <noreply@topbotcopier.com>',
 )
 
 # Django Axes
