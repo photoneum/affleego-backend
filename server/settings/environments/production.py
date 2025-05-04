@@ -168,7 +168,8 @@ SPECTACULAR_SETTINGS['SERVERS'] = [
     {'url': config('DOMAIN_NAME', default=''), 'description': 'Production server'},
 ]
 
-CORS_ALLOWED_ORIGIN_REGEXES = [r'^/api/.*$', config('DOMAIN_NAME', default='')]
+# CORS_ALLOWED_ORIGIN_REGEXES = [r'^/api/.*$', config('DOMAIN_NAME', default='')]
+CORS_ALLOWED_ORIGINS = [config('DOMAIN_NAME', default=''), config('FRONTEND_URL', default='')]
 
 # Emails
 EMAIL_BACKEND = 'django.core.mail.backends.smtp.EmailBackend'
