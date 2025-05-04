@@ -77,9 +77,9 @@ MIDDLEWARE: tuple[str, ...] = (
 
 ROOT_URLCONF = 'server.urls'
 
-# Disable automatic trailing slash redirection
+# Enable automatic trailing slash redirection
 # https://docs.djangoproject.com/en/4.2/ref/settings/#append-slash
-APPEND_SLASH = True
+APPEND_SLASH = False
 
 WSGI_APPLICATION = 'server.wsgi.application'
 
@@ -377,3 +377,10 @@ DEFAULT_FROM_EMAIL = config(
     'DEFAULT_FROM_EMAIL',
     default='Affleego <noreply@affleego.com>',
 )
+
+# Django Axes
+# https://django-axes.readthedocs.io/en/latest/4_configuration.html#configuring-caches
+
+AXES_FAILURE_LIMIT = 2
+# AXES_COOLOFF_TIME = timedelta(seconds=30)  # noqa: ERA001
+AXES_COOLOFF_TIME = 0.0083

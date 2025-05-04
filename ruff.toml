@@ -74,6 +74,7 @@ ignore = [
   "D417",
   "B026",
   "D107",
+  "D205",
 ]
 
 external = ["WPS"]

@@ -7,6 +7,7 @@ from django.utils.translation import gettext_lazy as _
 
 from server.apps.users.managers import UserManager
 from server.common.mixins import UUIDMixin
+from server.common.utils.file_url_helpers import get_full_url
 
 
 # # Create your models here.
@@ -20,6 +21,7 @@ class User(AbstractUser, UUIDMixin):
         ADMIN = 'admin', 'Admin'
         USER = 'user', 'User'
 
+    id: int
     email = models.EmailField(_('email address'), unique=True)
     phone_number = models.CharField(_('phone number'), blank=True, max_length=20)
     image = models.ImageField(_('image'), upload_to='users/', null=True, blank=True)
@@ -55,3 +57,9 @@ class User(AbstractUser, UUIDMixin):
     @property
     def full_name(self):
         return self.get_full_name()
+
+    @property
+    def get_image_url(self):
+        if self.image:
+            return get_full_url(self.image.url)
+        return None
