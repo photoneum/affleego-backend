@@ -37,6 +37,16 @@ LOGGING = {
                 structlog.processors.TimeStamper(fmt='iso'),
             ],
         },
+        'verbose': {
+            '()': structlog.stdlib.ProcessorFormatter,
+            'processor': structlog.dev.ConsoleRenderer(colors=True),
+            'foreign_pre_chain': [
+                structlog.stdlib.add_log_level,
+                structlog.stdlib.add_logger_name,
+                structlog.processors.TimeStamper(fmt='iso'),
+                structlog.processors.format_exc_info,
+            ],
+        },
     },
     # You can easily swap `key/value` (default) output and `json` ones.
     # Use `'json_console'` if you need `json` logs.
@@ -44,6 +54,10 @@ LOGGING = {
         'console': {
             'class': 'logging.StreamHandler',
             'formatter': 'console',
+        },
+        'verbose_console': {
+            'class': 'logging.StreamHandler',
+            'formatter': 'verbose',
         },
         'json_console': {
             'class': 'logging.StreamHandler',
@@ -55,12 +69,17 @@ LOGGING = {
     # - security is required by `axes`
     'loggers': {
         'django': {
-            'handlers': ['console'],
+            'handlers': ['verbose_console'],
             'level': 'INFO',
             'propagate': True,
         },
+        'django.request': {
+            'handlers': ['verbose_console'],
+            'level': 'ERROR',
+            'propagate': False,
+        },
         'security': {
-            'handlers': ['console'],
+            'handlers': ['verbose_console'],
             'level': 'ERROR',
             'propagate': False,
         },
@@ -100,7 +119,6 @@ if not structlog.is_configured():
             structlog.stdlib.add_log_level,
             structlog.stdlib.PositionalArgumentsFormatter(),
             structlog.processors.StackInfoRenderer(),
-            structlog.processors.format_exc_info,
             structlog.processors.UnicodeDecoder(),
             structlog.processors.ExceptionPrettyPrinter(),
             structlog.stdlib.ProcessorFormatter.wrap_for_formatter,

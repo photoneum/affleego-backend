@@ -38,3 +38,10 @@ class CustomUserAdmin(UserAdmin):
             },
         ),
     )
+
+
+@admin.register(models.VerificationCode)
+class VerificationCodeAdmin(admin.ModelAdmin):
+    list_display = ('code', 'user', 'is_used', 'created_at', 'expires_at')
+    search_fields = ('code', 'user__email')
+    list_filter = ('is_used',)

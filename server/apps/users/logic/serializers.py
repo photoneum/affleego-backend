@@ -2,7 +2,10 @@ from typing import TYPE_CHECKING, Any
 
 from django.contrib.auth.password_validation import validate_password
 from rest_framework import serializers
-from rest_framework_simplejwt.serializers import TokenObtainPairSerializer
+from rest_framework_simplejwt.serializers import (
+    TokenObtainPairSerializer,
+    TokenRefreshSerializer,
+)
 
 from server.apps.users.logic.utils import get_custom_user_model
 
@@ -43,6 +46,24 @@ class UserOnboardingSerializer(serializers.Serializer):
 
 class CustomTokenObtainPairSerializer(TokenObtainPairSerializer):
     def validate(self, attrs):
+        data: dict[str, Any] = super().validate(attrs)
+        user: UserModel = self.user  # type: ignore
+        if not user.is_verified:
+            raise serializers.ValidationError({'email': 'Please verify your email address first.'})
+
+        # add user data to payload
+        data['user'] = {
+            'email': user.email,
+            'first_name': user.first_name,
+            'last_name': user.last_name,
+            'phone_number': user.phone_number,
+            'image_url': user.get_image_url,
+        }
+        return data
+
+
+class CustomTokenRefreshSerializer(TokenRefreshSerializer):
+    def validate(self, attrs):
         data = super().validate(attrs)
         if not self.user.is_verified:  # type: ignore
             raise serializers.ValidationError({'email': 'Please verify your email address first.'})
@@ -56,3 +77,10 @@ class PasswordResetRequestSerializer(serializers.Serializer):
 class PasswordResetConfirmSerializer(serializers.Serializer):
     email = serializers.EmailField()
     password = serializers.CharField(write_only=True, validators=[validate_password])
+
+
+class VerificationSerializer(serializers.Serializer):
+    """Serializer for email verification."""
+
+    email = serializers.EmailField()
+    code = serializers.CharField(max_length=6)
