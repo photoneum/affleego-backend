@@ -19,7 +19,7 @@ HOSTS = config('ALLOWED_HOSTS', default='')
 
 ALLOWED_HOSTS = [
     # Split the domains by comma and filter out empty strings
-    *[host.strip() for host in HOSTS.split(',') if host.strip()],
+    *[host.strip() for host in HOSTS.split(',') if host.strip()],  # type: ignore
     # We need this value for `healthcheck` to work:
     'localhost',
 ]
@@ -38,7 +38,6 @@ _COLLECTSTATIC_DRYRUN = config(
 # Adding STATIC_ROOT to collect static files via 'collectstatic':
 STATIC_ROOT = '.static' if _COLLECTSTATIC_DRYRUN else '/var/www/affleego/django/static'
 
-# TODO: convert to `STORAGES`
 STORAGES = {
     'default': {
         'BACKEND': 'django.core.files.storage.FileSystemStorage',
