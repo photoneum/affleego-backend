@@ -8,27 +8,39 @@
           href="{{ domain_name }}{% static 'main/images/logo.png' %}" />
     <meta content="text/html; charset=UTF-8" http-equiv="Content-Type" />
     <meta name="x-apple-disable-message-reformatting" />
+    <style>
+    @media(min-width:768px) {
+      .md_p-45px {
+        padding: 45px !important
+      }
+
+      .md_w-600px {
+        width: 600px !important
+      }
+    }
+
+    </style>
   </head>
-  <body style="padding:10px;background-color:#111114">
+  <body style="background-color:rgb(17,17,20);padding:10px">
     <!--$-->
     <div style="display:none;
                 overflow:hidden;
                 line-height:1px;
                 opacity:0;
                 max-height:0;
-                max-width:0">
-      Verify your affleego account
-      <div></div>
-    </div>
+                max-width:0">Verify your affleego account</div>
     <table align="center"
            width="100%"
+           class="md_p-45px md_w-600px"
            border="0"
            cellpadding="0"
            cellspacing="0"
            role="presentation"
-           style="max-width:37.5em;
-                  background-color:#111114;
-                  padding:45px">
+           style="background-color:rgb(17,17,20);
+                  margin-left:auto;
+                  margin-right:auto;
+                  max-width:100%;
+                  padding:10px">
       <tbody>
         <tr style="width:100%">
           <td>
@@ -49,43 +61,43 @@
                    cellpadding="0"
                    cellspacing="0"
                    role="presentation"
-                   style="background-color:#1C1C1C;
+                   style="background-color:rgb(28,28,28);
                           padding:20px;
                           border-radius:10px;
-                          color:#ffffff">
+                          color:rgb(255,255,255)">
               <tbody>
                 <tr>
                   <td>
                     <p style="font-size:16px;
-                              line-height:26px;
                               font-family:&#x27;
                               Open Sans&#x27;
-                              , Helvetica, Arial, sans-serif;
+                              ,Helvetica,Arial,sans-serif;
                               font-weight:300;
-                              color:#ffffff;
+                              color:rgb(255,255,255);
+                              line-height:26px;
                               margin-top:16px;
                               margin-bottom:16px">
                       Hello {{ user.first_name }},
                     </p>
                     <p style="font-size:16px;
-                              line-height:26px;
                               font-family:&#x27;
                               Open Sans&#x27;
-                              , Helvetica, Arial, sans-serif;
+                              ,Helvetica,Arial,sans-serif;
                               font-weight:300;
-                              color:#ffffff;
+                              color:rgb(255,255,255);
+                              line-height:26px;
                               margin-top:16px;
                               margin-bottom:16px">
                       Welcome to Affleego! We&#x27;re absolutely thrilled to
                       have you join our community!
                     </p>
                     <p style="font-size:16px;
-                              line-height:26px;
                               font-family:&#x27;
                               Open Sans&#x27;
-                              , Helvetica, Arial, sans-serif;
+                              ,Helvetica,Arial,sans-serif;
                               font-weight:300;
-                              color:#ffffff;
+                              color:rgb(255,255,255);
+                              line-height:26px;
                               margin-top:16px;
                               margin-bottom:16px">
                       Your journey with us begins now. To get started and unlock
@@ -93,22 +105,30 @@
                       email address by clicking the link below.
                     </p>
                     <a href="{{ verification_url }}"
-                       style="line-height:100%;
-                              text-decoration:none;
-                              display:block;
-                              max-width:100%;
-                              mso-padding-alt:0px;
-                              background-color:#FFDD00;
+                       style="background-color:rgb(255,221,0);
                               border-radius:6px;
-                              color:#111114;
+                              color:rgb(17,17,20);
                               font-family:&#x27;
                               Open Sans&#x27;
-                              , Helvetica, Arial, sans-serif;
+                              ,Helvetica,Arial,sans-serif;
                               font-size:16px;
                               font-weight:600;
+                              text-decoration-line:none;
                               text-align:center;
-                              margin:24px auto;
+                              display:block;
+                              margin-left:auto;
+                              margin-right:auto;
+                              margin-top:24px;
+                              margin-bottom:24px;
                               width:220px;
+                              padding-top:14px;
+                              padding-bottom:14px;
+                              padding-left:7px;
+                              padding-right:7px;
+                              line-height:100%;
+                              text-decoration:none;
+                              max-width:100%;
+                              mso-padding-alt:0px;
                               padding:14px 7px 14px 7px"
                        target="_blank"><span>
                       <!--[if mso]><i style="mso-font-width:350%;mso-text-raise:21" hidden>&#8202;</i><![endif]--></span><span style="max-width:100%;
@@ -119,24 +139,24 @@
                       Your Account</span><span>
                       <!--[if mso]><i style="mso-font-width:350%" hidden>&#8202;&#8203;</i><![endif]--></span></a>
                       <p style="font-size:16px;
-                                line-height:26px;
                                 font-family:&#x27;
                                 Open Sans&#x27;
-                                , Helvetica, Arial, sans-serif;
+                                ,Helvetica,Arial,sans-serif;
                                 font-weight:300;
-                                color:#ffffff;
+                                color:rgb(255,255,255);
+                                line-height:26px;
                                 margin-top:16px;
                                 margin-bottom:16px">
                         We can&#x27;t wait to see what you&#x27;ll accomplish with
                         Affleego!
                       </p>
                       <p style="font-size:16px;
-                                line-height:26px;
                                 font-family:&#x27;
                                 Open Sans&#x27;
-                                , Helvetica, Arial, sans-serif;
+                                ,Helvetica,Arial,sans-serif;
                                 font-weight:300;
-                                color:#ffffff;
+                                color:rgb(255,255,255);
+                                line-height:26px;
                                 margin-top:16px;
                                 margin-bottom:16px">
                         Warm regards,
