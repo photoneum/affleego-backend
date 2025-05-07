@@ -216,6 +216,25 @@ class EmailNotificationFactory:
         )
 
     @staticmethod
+    def create_password_reset_email(
+        user_email: str,
+        context: dict[str, Any],
+    ) -> EmailNotification:
+        """Create an email notification for password reset."""
+        subject = 'Reset your password'
+        domain_name = config('DOMAIN_NAME')
+        template_path = 'users/emails/send_password_reset_link.html'
+        context['domain_name'] = domain_name
+
+        return EmailNotification(
+            subject=subject,
+            template_path=template_path,
+            context=context,
+            to_emails=[user_email],
+            reply_to=['noreply@affleego.com'],
+        )
+
+    @staticmethod
     def create_custom_email(
         subject: str,
         from_email: str,

@@ -55,7 +55,7 @@ class User(AbstractUser, UUIDMixin):
         constraints = [
             models.CheckConstraint(
                 name='users_user_type_valid',
-                condition=models.Q(type__in=['admin', 'user']),  # type: ignore
+                check=models.Q(type__in=['admin', 'user']),
             ),
         ]
 
@@ -82,6 +82,12 @@ class VerificationCode(models.Model):
     # if TYPE_CHECKING:
     #     user = ForeignKey[User]
 
+    class Type(models.TextChoices):
+        """Verification code type choices."""
+
+        VERIFY_ACCOUNT = 'verify_account', 'Verify Account'
+        RESET_PASSWORD = 'reset_password', 'Reset Password'
+
     user = models.ForeignKey(
         User,
         on_delete=models.CASCADE,
@@ -104,10 +110,22 @@ class VerificationCode(models.Model):
         _('is used'),
         default=False,
     )
+    type = models.CharField(
+        _('type'),
+        max_length=20,
+        choices=Type.choices,
+        default=Type.VERIFY_ACCOUNT,
+    )
 
     class Meta:
         verbose_name = _('Verification Code')
         verbose_name_plural = _('Verification Codes')
+        constraints = [
+            models.CheckConstraint(
+                check=models.Q(type__in=['verify_account', 'reset_password']),
+                name='users_verificationcode_type_valid',
+            ),
+        ]
 
     def __str__(self):
         return f'Code for {self.user.email}'
@@ -117,7 +135,12 @@ class VerificationCode(models.Model):
         return not self.is_used and self.expires_at > timezone.now()
 
     @classmethod
-    def generate_code(cls, user: User, expiry_minutes: int = 10) -> 'VerificationCode':
+    def generate_code(
+        cls,
+        user: User,
+        code_type: Type = Type.VERIFY_ACCOUNT,
+        expiry_minutes: int = 10,
+    ) -> 'VerificationCode':
         """Generate a new verification code for the user."""
         # Generate a random 6-digit code
         code = ''.join([str(secrets.randbelow(10)) for _ in range(6)])
@@ -130,4 +153,5 @@ class VerificationCode(models.Model):
             user=user,
             code=code,
             expires_at=expires_at,
+            type=code_type,
         )

@@ -44,7 +44,10 @@ class AuthViewSet(viewsets.GenericViewSet):
         user = serializer.save()
 
         # Generate verification code
-        verification_code = VerificationCode.generate_code(user)
+        verification_code = VerificationCode.generate_code(
+            user,
+            code_type=VerificationCode.Type.VERIFY_ACCOUNT,
+        )
 
         context: dict[str, Any] = {
             'user': user,
@@ -69,7 +72,10 @@ class AuthViewSet(viewsets.GenericViewSet):
         serializer.is_valid(raise_exception=True)
         email = serializer.validated_data['email']
         user = User.objects.get(email=email)
-        verification_code = VerificationCode.generate_code(user)
+        verification_code = VerificationCode.generate_code(
+            user,
+            code_type=VerificationCode.Type.VERIFY_ACCOUNT,
+        )
         context: dict[str, Any] = {
             'user': user,
             'verification_url': f'{config("FRONTEND_URL")}/auth/verify-account/?email={user.email}&code={verification_code.code}',  # noqa: E501
@@ -102,24 +108,16 @@ class AuthViewSet(viewsets.GenericViewSet):
             user = User.objects.get(email=email)
         except User.DoesNotExist:
             return ApiResponse(
-                {'detail': 'User with this email does not exist.'},
+                message='User with this email does not exist.',
                 status=status.HTTP_404_NOT_FOUND,
             )
 
         # Find the verification code
-        # verification_code = (
-        #     user.verification_codes.filter(
-        #         code=code,
-        #         is_used=False,
-        #     )
-        #     .order_by('-created_at')
-        #     .first()
-        # )
-
         verification_code = (
             user.verification_codes.filter(
                 code=code,
                 is_used=False,
+                type=VerificationCode.Type.VERIFY_ACCOUNT,
             )
             .order_by('-created_at')
             .first()
@@ -127,7 +125,7 @@ class AuthViewSet(viewsets.GenericViewSet):
 
         if not verification_code or not verification_code.is_valid():
             return ApiResponse(
-                {'detail': 'Invalid or expired verification code.'},
+                message='Invalid or expired verification code.',
                 status=status.HTTP_400_BAD_REQUEST,
             )
 
@@ -167,7 +165,7 @@ class CustomTokenObtainPairView(TokenObtainPairView):
         serializer = self.get_serializer(data=request.data)
         if serializer.is_valid():
             return super().post(request)
-        return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
+        return ApiResponse(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
 
 
 @extend_schema(tags=['Authentication'])
@@ -178,7 +176,7 @@ class CustomTokenRefreshView(TokenRefreshView):
         serializer = self.get_serializer(data=request.data)
         if serializer.is_valid():
             return super().post(request)
-        return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
+        return ApiResponse(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
 
 
 @extend_schema(tags=['Authentication'])
@@ -196,17 +194,31 @@ class PasswordResetRequestView(generics.GenericAPIView):
         if serializer.is_valid():
             email = serializer.validated_data['email']
             try:
-                User.objects.get(email=email)
-                # TODO: Send password reset email
-                return Response(
-                    {'detail': 'Password reset email has been sent.'}, status=status.HTTP_200_OK
+                user = User.objects.get(email=email)
+                verification_code = VerificationCode.generate_code(
+                    user,
+                    code_type=VerificationCode.Type.RESET_PASSWORD,
+                )
+
+                context: dict[str, Any] = {
+                    'user': user,
+                    'verification_url': f'{config("FRONTEND_URL")}/auth/reset-password/?email={user.email}&code={verification_code.code}',  # noqa: E501
+                }
+                email = EmailNotificationFactory.create_resend_verification_link_email(
+                    user.email,
+                    context,
+                )
+                email.send()
+                return ApiResponse(
+                    message='Password reset email has been sent.',
+                    status=status.HTTP_200_OK,
                 )
             except User.DoesNotExist:
-                return Response(
-                    {'detail': 'User with this email does not exist.'},
+                return ApiResponse(
+                    message='User with this email does not exist.',
                     status=status.HTTP_404_NOT_FOUND,
                 )
-        return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
+        return ApiResponse(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
 
 
 @extend_schema(tags=['Authentication'])
@@ -224,16 +236,49 @@ class PasswordResetConfirmView(generics.GenericAPIView):
         if serializer.is_valid():
             email = serializer.validated_data['email']
             new_password = serializer.validated_data['password']
+            code = serializer.validated_data['code']
+
+            # Find the verification code
+            verification_code = (
+                VerificationCode.objects.filter(
+                    user__email=email,
+                    code=code,
+                    is_used=False,
+                    type=VerificationCode.Type.RESET_PASSWORD,
+                )
+                .order_by('-created_at')
+                .first()
+            )
+
+            if not verification_code or not verification_code.is_valid():
+                return ApiResponse(
+                    message='Invalid or expired verification code.',
+                    status=status.HTTP_400_BAD_REQUEST,
+                )
+
+            # Mark the code as used
+            verification_code.is_used = True
+            verification_code.save(update_fields=['is_used'])
+
             try:
                 user = User.objects.get(email=email)
                 user.set_password(new_password)
                 user.save()
-                return Response(
-                    {'detail': 'Password has been reset successfully.'}, status=status.HTTP_200_OK
+
+                # delete previous unused verification codes
+                VerificationCode.objects.filter(
+                    user__email=email,
+                    is_used=False,
+                    type=VerificationCode.Type.RESET_PASSWORD,
+                ).delete()
+
+                return ApiResponse(
+                    message='Password has been reset successfully.',
+                    status=status.HTTP_200_OK,
                 )
             except User.DoesNotExist:
-                return Response(
-                    {'detail': 'User with this email does not exist.'},
+                return ApiResponse(
+                    message='User with this email does not exist.',
                     status=status.HTTP_404_NOT_FOUND,
                 )
-        return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
+        return ApiResponse(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
