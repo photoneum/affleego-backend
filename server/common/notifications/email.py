@@ -186,6 +186,36 @@ class EmailNotificationFactory:
         )
 
     @staticmethod
+    def create_resend_verification_link_email(
+        user_email: str,
+        context: dict[str, Any],
+    ) -> EmailNotification:
+        """
+        Create an email notification for resending the verification link.
+
+        Args:
+            user_email: Email address of the recipient
+            context: Template context variables
+            cc_emails: Optional list of CC recipients
+            reply_to: Optional list of reply-to addresses
+
+        Returns:
+            Configured EmailNotification object
+        """
+        subject = 'Verification link'
+        domain_name = config('DOMAIN_NAME')
+        template_path = 'users/emails/resend_verification_link.html'
+        context['domain_name'] = domain_name
+
+        return EmailNotification(
+            subject=subject,
+            template_path=template_path,
+            context=context,
+            to_emails=[user_email],
+            reply_to=['noreply@affleego.com'],
+        )
+
+    @staticmethod
     def create_custom_email(
         subject: str,
         from_email: str,

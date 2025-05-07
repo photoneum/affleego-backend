@@ -384,3 +384,7 @@ DEFAULT_FROM_EMAIL = config(
 # AXES_FAILURE_LIMIT = 2
 # # AXES_COOLOFF_TIME = timedelta(seconds=30)
 # AXES_COOLOFF_TIME = 0.0083
+
+# Timezone
+USE_TZ = True
+TIME_ZONE = 'Africa/Lagos'

@@ -34,6 +34,10 @@ class UserRegistrationSerializer(serializers.ModelSerializer['UserModel']):
         return user
 
 
+class ResendVerificationCodeSerializer(serializers.Serializer):
+    email = serializers.EmailField(required=True)
+
+
 class UserOnboardingSerializer(serializers.Serializer):
     brand_name = serializers.CharField(max_length=255)
     website = serializers.URLField(required=False, allow_blank=True)

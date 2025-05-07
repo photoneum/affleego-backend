@@ -13,6 +13,7 @@ from server.apps.users.logic.serializers import (
     CustomTokenRefreshSerializer,
     PasswordResetConfirmSerializer,
     PasswordResetRequestSerializer,
+    ResendVerificationCodeSerializer,
     UserOnboardingSerializer,
     UserRegistrationSerializer,
     VerificationSerializer,
@@ -57,6 +58,33 @@ class AuthViewSet(viewsets.GenericViewSet):
         return ApiResponse(serializer.data, status=status.HTTP_201_CREATED)
 
     @extend_schema(
+        request=ResendVerificationCodeSerializer,
+        responses={200: None},
+        description='Resend verification code',
+        summary='Resend Verification Code',
+    )
+    @action(detail=False, methods=['post'], url_path='resend-verification-code')
+    def resend_verification_code(self, request: Request) -> Response:
+        serializer = ResendVerificationCodeSerializer(data=request.data)
+        serializer.is_valid(raise_exception=True)
+        email = serializer.validated_data['email']
+        user = User.objects.get(email=email)
+        verification_code = VerificationCode.generate_code(user)
+        context: dict[str, Any] = {
+            'user': user,
+            'verification_url': f'{config("FRONTEND_URL")}/auth/verify-account/?email={user.email}&code={verification_code.code}',  # noqa: E501
+        }
+        email = EmailNotificationFactory.create_resend_verification_link_email(
+            user.email,
+            context,
+        )
+        email.send()
+        return ApiResponse(
+            message='Verification code has been sent.',
+            status=status.HTTP_200_OK,
+        )
+
+    @extend_schema(
         request=VerificationSerializer,
         responses={200: None},
         description='Verify user email with verification code',
@@ -79,6 +107,15 @@ class AuthViewSet(viewsets.GenericViewSet):
             )
 
         # Find the verification code
+        # verification_code = (
+        #     user.verification_codes.filter(
+        #         code=code,
+        #         is_used=False,
+        #     )
+        #     .order_by('-created_at')
+        #     .first()
+        # )
+
         verification_code = (
             user.verification_codes.filter(
                 code=code,
@@ -96,7 +133,7 @@ class AuthViewSet(viewsets.GenericViewSet):
 
         # Mark the code as used
         verification_code.is_used = True
-        verification_code.save()
+        verification_code.save(update_fields=['is_used'])
 
         # Activate the user
         user.is_verified = True
@@ -104,7 +141,7 @@ class AuthViewSet(viewsets.GenericViewSet):
         user.save(update_fields=['is_verified', 'is_active'])
 
         return ApiResponse(
-            {'detail': 'Email verification successful. You can now login.'},
+            message='Email verified successfully. You can now login.',
             status=status.HTTP_200_OK,
         )
 
