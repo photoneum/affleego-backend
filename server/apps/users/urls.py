@@ -15,10 +15,10 @@ router.register('auth', AuthViewSet, basename='auth')
 
 urlpatterns = [
     path('', include(router.urls)),
-    path('auth/login/', CustomTokenObtainPairView.as_view(), name='token_obtain_pair'),
-    path('auth/password-reset/', PasswordResetRequestView.as_view(), name='password_reset'),
+    path('auth/login', CustomTokenObtainPairView.as_view(), name='token_obtain_pair'),
+    path('auth/password-reset', PasswordResetRequestView.as_view(), name='password_reset'),
     path(
-        'auth/password-reset/confirm/',
+        'auth/password-reset/confirm',
         PasswordResetConfirmView.as_view(),
         name='password_reset_confirm',
     ),
