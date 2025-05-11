@@ -988,6 +988,21 @@ files = [
 typing_extensions = ">=4.0"
 
 [[package]]
+name = "django-tinymce"
+version = "4.1.0"
+description = "A Django application that contains a widget to render a"
+optional = false
+python-versions = ">=3.8"
+groups = ["main"]
+files = [
+    {file = "django_tinymce-4.1.0-py3-none-any.whl", hash = "sha256:9804836e6d2b08de3b03a27c100f8c2e9633549913eff8b323678a10cd48b94e"},
+    {file = "django_tinymce-4.1.0.tar.gz", hash = "sha256:02e3b70e940fd299f0fbef4315aee5c185664e1eb8cd396b176963954e4357c9"},
+]
+
+[package.dependencies]
+django = ">=3.2"
+
+[[package]]
 name = "django-types"
 version = "0.20.0"
 description = "Type stubs for Django"
@@ -3825,4 +3840,4 @@ dev = ["doc8", "flake8", "flake8-import-order", "rstcheck[sphinx]", "sphinx"]
 [metadata]
 lock-version = "2.1"
 python-versions = ">3.12,<3.13"
-content-hash = "49033515c938ff11de60a2f204436e6eff35943c680f410214e00e1ac78b8137"
+content-hash = "227cd6cb088930fa213ede6222ce84a527c212ed7ee007e63b44f3a96e03ad2d"

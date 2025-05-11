@@ -181,7 +181,6 @@ class UserOnboarding(UUIDMixin, CreatedAtMixin, UpdatedAtMixin, models.Model):
     marketing_methods = models.CharField(
         _('marketing methods'),
         blank=True,
-        null=True,
         help_text=_('List of marketing methods used by the user'),
     )
     heard_from = models.CharField(
