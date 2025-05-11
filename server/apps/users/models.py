@@ -96,7 +96,7 @@ class VerificationCode(models.Model):
     )
     code = models.CharField(
         _('verification code'),
-        max_length=6,
+        max_length=12,
         unique=True,
     )
     created_at = models.DateTimeField(
@@ -142,8 +142,11 @@ class VerificationCode(models.Model):
         expiry_minutes: int = 10,
     ) -> 'VerificationCode':
         """Generate a new verification code for the user."""
-        # Generate a random 6-digit code
-        code = ''.join([str(secrets.randbelow(10)) for _ in range(6)])
+        # Generate a random 12-character code with letters and numbers
+        import string  # noqa: PLC0415
+
+        chars = string.ascii_letters + string.digits
+        code = ''.join(secrets.choice(chars) for _ in range(12))
 
         # Set expiry time
         expires_at = timezone.now() + timedelta(minutes=expiry_minutes)
