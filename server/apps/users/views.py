@@ -1,4 +1,4 @@
-from typing import Any
+from typing import TYPE_CHECKING, Any
 
 from drf_spectacular.utils import extend_schema
 from rest_framework import generics, status, viewsets
@@ -25,6 +25,9 @@ from server.common.notifications.email import EmailNotificationFactory
 from server.settings.components import config
 
 User = get_custom_user_model()
+
+if TYPE_CHECKING:
+    from server.apps.users.models import UserOnboarding
 
 
 @extend_schema(tags=['Authentication'])
@@ -160,7 +163,16 @@ class AuthViewSet(viewsets.GenericViewSet):
     def onboarding(self, request: Request) -> Response:
         serializer = UserOnboardingSerializer(data=request.data)
         serializer.is_valid(raise_exception=True)
-        serializer.save()
+        onboarding: UserOnboarding = serializer.save()
+
+        context: dict[str, Any] = {
+            'user': onboarding.user,
+        }
+        email = EmailNotificationFactory.create_welcome_email(
+            onboarding.user.email,
+            context,
+        )
+        email.send()
 
         return ApiResponse(
             message='Onboarding completed successfully.',

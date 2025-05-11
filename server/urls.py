@@ -20,6 +20,7 @@ from drf_spectacular.views import (
 )
 from health_check import urls as health_urls
 
+from server.apps.deals import urls as deals_urls
 from server.apps.main.views import index
 from server.apps.users import urls as users_urls
 
@@ -49,8 +50,14 @@ urlpatterns = [
         f'{API_PREFIX}/{API_VERSION}/',
         include(users_urls, namespace='users'),
     ),
+    path(
+        f'{API_PREFIX}/{API_VERSION}/',
+        include(deals_urls, namespace='deals'),
+    ),
     # Health checks:
     path('health/', include(health_urls)),
+    # tinymce:
+    path('tinymce/', include('tinymce.urls')),
     # django-admin:
     path('admin/doc/', include(admindocs_urls)),
     path('admin/', admin.site.urls),

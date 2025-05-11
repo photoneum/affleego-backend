@@ -22,6 +22,7 @@ INSTALLED_APPS: tuple[str, ...] = (
     # Your apps go here:
     'server.apps.main',
     'server.apps.users',
+    'server.apps.deals',
     # Default django apps:
     'django.contrib.auth',
     'django.contrib.contenttypes',
@@ -50,6 +51,8 @@ INSTALLED_APPS: tuple[str, ...] = (
     'drf_spectacular',
     # corsheaders
     'corsheaders',
+    # tinymce
+    'tinymce',
 )
 
 MIDDLEWARE: tuple[str, ...] = (
@@ -356,9 +359,17 @@ REST_FRAMEWORK = {
     'DEFAULT_PERMISSION_CLASSES': [
         'rest_framework.permissions.DjangoModelPermissionsOrAnonReadOnly',
     ],
+    'DEFAULT_AUTHENTICATION_CLASSES': (
+        'rest_framework_simplejwt.authentication.JWTAuthentication',
+    ),
     'DEFAULT_SCHEMA_CLASS': 'drf_spectacular.openapi.AutoSchema',
     # Custom exception handler
     'EXCEPTION_HANDLER': 'server.common.exception_handler.custom_exception_handler',
+}
+
+SIMPLE_JWT = {
+    'JWT_AUTH_HEADER_PREFIX': 'Bearer',
+    'JWT_AUTH_HEADER_ENCODING': 'utf-8',
 }
 
 SPECTACULAR_SETTINGS = {

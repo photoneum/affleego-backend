@@ -181,12 +181,25 @@ class UserOnboarding(UUIDMixin, CreatedAtMixin, UpdatedAtMixin, models.Model):
     marketing_methods = models.CharField(
         _('marketing methods'),
         blank=True,
-        null=True,
         help_text=_('List of marketing methods used by the user'),
     )
     heard_from = models.CharField(
         _('heard from'),
         max_length=255,
+    )
+    ftds_deliverability_per_month = models.IntegerField(
+        _('ftds deliverability per month'),
+        blank=True,
+    )
+    affliate_experience = models.CharField(
+        _('affliate experience'),
+        max_length=255,
+        blank=True,
+    )
+    type_of_deals_wanted = models.CharField(
+        _('type of deals wanted'),
+        max_length=255,
+        blank=True,
     )
     feedback_message = models.TextField(
         _('feedback message'),
