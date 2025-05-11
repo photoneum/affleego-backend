@@ -138,6 +138,13 @@ class AuthViewSet(viewsets.GenericViewSet):
         user.is_active = True
         user.save(update_fields=['is_verified', 'is_active'])
 
+        # Delete previous unused verification codes
+        VerificationCode.objects.filter(
+            user=user,
+            is_used=False,
+            type=VerificationCode.Type.VERIFY_ACCOUNT,
+        ).delete()
+
         return ApiResponse(
             message='Email verified successfully. You can now login.',
             status=status.HTTP_200_OK,
