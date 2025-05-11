@@ -9,7 +9,7 @@ from django.utils import timezone
 from django.utils.translation import gettext_lazy as _
 
 from server.apps.users.managers import UserManager
-from server.common.mixins import UUIDMixin
+from server.common.mixins import CreatedAtMixin, UpdatedAtMixin, UUIDMixin
 from server.common.utils.file_url_helpers import get_full_url
 
 if TYPE_CHECKING:
@@ -96,7 +96,7 @@ class VerificationCode(models.Model):
     )
     code = models.CharField(
         _('verification code'),
-        max_length=6,
+        max_length=12,
         unique=True,
     )
     created_at = models.DateTimeField(
@@ -142,8 +142,11 @@ class VerificationCode(models.Model):
         expiry_minutes: int = 10,
     ) -> 'VerificationCode':
         """Generate a new verification code for the user."""
-        # Generate a random 6-digit code
-        code = ''.join([str(secrets.randbelow(10)) for _ in range(6)])
+        # Generate a random 12-character code with letters and numbers
+        import string  # noqa: PLC0415
+
+        chars = string.ascii_letters + string.digits
+        code = ''.join(secrets.choice(chars) for _ in range(12))
 
         # Set expiry time
         expires_at = timezone.now() + timedelta(minutes=expiry_minutes)
@@ -155,3 +158,57 @@ class VerificationCode(models.Model):
             expires_at=expires_at,
             type=code_type,
         )
+
+
+@final
+class UserOnboarding(UUIDMixin, CreatedAtMixin, UpdatedAtMixin, models.Model):
+    """Model for storing user onboarding data."""
+
+    user = models.OneToOneField(
+        User,
+        on_delete=models.CASCADE,
+        related_name='onboarding',
+        verbose_name=_('user'),
+    )
+    brand_name = models.CharField(
+        _('brand name'),
+        max_length=255,
+    )
+    website = models.URLField(
+        _('website'),
+        blank=True,
+    )
+    marketing_methods = models.CharField(
+        _('marketing methods'),
+        blank=True,
+        help_text=_('List of marketing methods used by the user'),
+    )
+    heard_from = models.CharField(
+        _('heard from'),
+        max_length=255,
+    )
+    ftds_deliverability_per_month = models.IntegerField(
+        _('ftds deliverability per month'),
+        blank=True,
+    )
+    affliate_experience = models.CharField(
+        _('affliate experience'),
+        max_length=255,
+        blank=True,
+    )
+    type_of_deals_wanted = models.CharField(
+        _('type of deals wanted'),
+        max_length=255,
+        blank=True,
+    )
+    feedback_message = models.TextField(
+        _('feedback message'),
+        blank=True,
+    )
+
+    class Meta:
+        verbose_name = _('User Onboarding')
+        verbose_name_plural = _('User Onboardings')
+
+    def __str__(self):
+        return f'Onboarding for {self.user.email}'

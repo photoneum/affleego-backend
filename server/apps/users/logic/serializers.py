@@ -8,6 +8,7 @@ from rest_framework_simplejwt.serializers import (
 )
 
 from server.apps.users.logic.utils import get_custom_user_model
+from server.apps.users.models import UserOnboarding
 
 User = get_custom_user_model()
 
@@ -38,14 +39,33 @@ class ResendVerificationCodeSerializer(serializers.Serializer):
     email = serializers.EmailField(required=True)
 
 
-class UserOnboardingSerializer(serializers.Serializer):
-    brand_name = serializers.CharField(max_length=255)
-    website = serializers.URLField(required=False, allow_blank=True)
-    marketing_methods = serializers.ListField(
-        child=serializers.CharField(max_length=100), required=False
-    )
-    heard_from = serializers.CharField(max_length=255)
-    feedback_message = serializers.CharField(required=False, allow_blank=True)
+class UserOnboardingSerializer(serializers.ModelSerializer['UserOnboarding']):
+    user_email = serializers.EmailField(required=True, write_only=True)
+
+    class Meta:
+        model = UserOnboarding
+        fields = (
+            'user_email',
+            'brand_name',
+            'website',
+            'marketing_methods',
+            'heard_from',
+            'feedback_message',
+            'ftds_deliverability_per_month',
+            'affliate_experience',
+            'type_of_deals_wanted',
+        )
+
+    def create(self, validated_data: dict[str, Any]) -> 'UserOnboarding':
+        user_email = validated_data.pop('user_email')
+        try:
+            user = User.objects.get(email=user_email)
+        except User.DoesNotExist:
+            raise serializers.ValidationError(
+                {'user_email': 'User with this email does not exist.'},
+                code='user_not_found',
+            ) from User.DoesNotExist
+        return UserOnboarding.objects.create(user=user, **validated_data)
 
 
 class CustomTokenObtainPairSerializer(TokenObtainPairSerializer):
@@ -80,7 +100,7 @@ class PasswordResetRequestSerializer(serializers.Serializer):
 
 class PasswordResetConfirmSerializer(serializers.Serializer):
     email = serializers.EmailField()
-    code = serializers.CharField(max_length=6)
+    code = serializers.CharField(max_length=12)
     password = serializers.CharField(write_only=True, validators=[validate_password])
 
 
@@ -88,4 +108,4 @@ class VerificationSerializer(serializers.Serializer):
     """Serializer for email verification."""
 
     email = serializers.EmailField()
-    code = serializers.CharField(max_length=6)
+    code = serializers.CharField(max_length=12)

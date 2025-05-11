@@ -1,9 +1,9 @@
-from typing import Any
+from typing import TYPE_CHECKING, Any
 
 from drf_spectacular.utils import extend_schema
 from rest_framework import generics, status, viewsets
 from rest_framework.decorators import action
-from rest_framework.permissions import AllowAny, IsAuthenticated
+from rest_framework.permissions import AllowAny
 from rest_framework.request import Request
 from rest_framework.response import Response
 from rest_framework_simplejwt.views import TokenObtainPairView, TokenRefreshView
@@ -25,6 +25,9 @@ from server.common.notifications.email import EmailNotificationFactory
 from server.settings.components import config
 
 User = get_custom_user_model()
+
+if TYPE_CHECKING:
+    from server.apps.users.models import UserOnboarding
 
 
 @extend_schema(tags=['Authentication'])
@@ -138,6 +141,13 @@ class AuthViewSet(viewsets.GenericViewSet):
         user.is_active = True
         user.save(update_fields=['is_verified', 'is_active'])
 
+        # Delete previous unused verification codes
+        VerificationCode.objects.filter(
+            user=user,
+            is_used=False,
+            type=VerificationCode.Type.VERIFY_ACCOUNT,
+        ).delete()
+
         return ApiResponse(
             message='Email verified successfully. You can now login.',
             status=status.HTTP_200_OK,
@@ -149,12 +159,25 @@ class AuthViewSet(viewsets.GenericViewSet):
         description='Complete user onboarding process',
         summary='User Onboarding',
     )
-    @action(detail=False, methods=['post'], permission_classes=[IsAuthenticated])
+    @action(detail=False, methods=['post'])
     def onboarding(self, request: Request) -> Response:
         serializer = UserOnboardingSerializer(data=request.data)
         serializer.is_valid(raise_exception=True)
-        # TODO: Save onboarding data to user profile or related model
-        return ApiResponse(serializer.data, status=status.HTTP_200_OK)
+        onboarding: UserOnboarding = serializer.save()
+
+        context: dict[str, Any] = {
+            'user': onboarding.user,
+        }
+        email = EmailNotificationFactory.create_welcome_email(
+            onboarding.user.email,
+            context,
+        )
+        email.send()
+
+        return ApiResponse(
+            message='Onboarding completed successfully.',
+            status=status.HTTP_200_OK,
+        )
 
 
 @extend_schema(tags=['Authentication'])
