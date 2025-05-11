@@ -235,6 +235,24 @@ class EmailNotificationFactory:
         )
 
     @staticmethod
+    def create_welcome_email(
+        user_email: str,
+        context: dict[str, Any],
+    ) -> EmailNotification:
+        """Create an email notification for welcome."""
+        subject = 'Unlock VIP Access: Join AFFLEEGO CLUB Now'
+        domain_name = config('DOMAIN_NAME')
+        template_path = 'users/emails/welcome.html'
+        context['domain_name'] = domain_name
+        return EmailNotification(
+            subject=subject,
+            template_path=template_path,
+            context=context,
+            to_emails=[user_email],
+            reply_to=['noreply@affleego.com'],
+        )
+
+    @staticmethod
     def create_custom_email(
         subject: str,
         from_email: str,

@@ -51,6 +51,9 @@ class UserOnboardingSerializer(serializers.ModelSerializer['UserOnboarding']):
             'marketing_methods',
             'heard_from',
             'feedback_message',
+            'ftds_deliverability_per_month',
+            'affliate_experience',
+            'type_of_deals_wanted',
         )
 
     def create(self, validated_data: dict[str, Any]) -> 'UserOnboarding':
