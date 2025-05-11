@@ -3,7 +3,7 @@ from typing import Any
 from drf_spectacular.utils import extend_schema
 from rest_framework import generics, status, viewsets
 from rest_framework.decorators import action
-from rest_framework.permissions import AllowAny, IsAuthenticated
+from rest_framework.permissions import AllowAny
 from rest_framework.request import Request
 from rest_framework.response import Response
 from rest_framework_simplejwt.views import TokenObtainPairView, TokenRefreshView
@@ -156,12 +156,16 @@ class AuthViewSet(viewsets.GenericViewSet):
         description='Complete user onboarding process',
         summary='User Onboarding',
     )
-    @action(detail=False, methods=['post'], permission_classes=[IsAuthenticated])
+    @action(detail=False, methods=['post'])
     def onboarding(self, request: Request) -> Response:
         serializer = UserOnboardingSerializer(data=request.data)
         serializer.is_valid(raise_exception=True)
-        # TODO: Save onboarding data to user profile or related model
-        return ApiResponse(serializer.data, status=status.HTTP_200_OK)
+        serializer.save()
+
+        return ApiResponse(
+            message='Onboarding completed successfully.',
+            status=status.HTTP_200_OK,
+        )
 
 
 @extend_schema(tags=['Authentication'])

@@ -9,7 +9,7 @@ from django.utils import timezone
 from django.utils.translation import gettext_lazy as _
 
 from server.apps.users.managers import UserManager
-from server.common.mixins import UUIDMixin
+from server.common.mixins import CreatedAtMixin, UpdatedAtMixin, UUIDMixin
 from server.common.utils.file_url_helpers import get_full_url
 
 if TYPE_CHECKING:
@@ -158,3 +158,44 @@ class VerificationCode(models.Model):
             expires_at=expires_at,
             type=code_type,
         )
+
+
+@final
+class UserOnboarding(UUIDMixin, CreatedAtMixin, UpdatedAtMixin, models.Model):
+    """Model for storing user onboarding data."""
+
+    user = models.OneToOneField(
+        User,
+        on_delete=models.CASCADE,
+        related_name='onboarding',
+        verbose_name=_('user'),
+    )
+    brand_name = models.CharField(
+        _('brand name'),
+        max_length=255,
+    )
+    website = models.URLField(
+        _('website'),
+        blank=True,
+    )
+    marketing_methods = models.CharField(
+        _('marketing methods'),
+        blank=True,
+        null=True,
+        help_text=_('List of marketing methods used by the user'),
+    )
+    heard_from = models.CharField(
+        _('heard from'),
+        max_length=255,
+    )
+    feedback_message = models.TextField(
+        _('feedback message'),
+        blank=True,
+    )
+
+    class Meta:
+        verbose_name = _('User Onboarding')
+        verbose_name_plural = _('User Onboardings')
+
+    def __str__(self):
+        return f'Onboarding for {self.user.email}'
