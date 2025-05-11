@@ -29,6 +29,7 @@ class UserRegistrationSerializer(serializers.ModelSerializer['UserModel']):
         }
 
     def create(self, validated_data: dict[str, Any]) -> 'UserModel':
+        validated_data['email'] = validated_data['email'].lower()
         user = User.objects.create_user(**validated_data)
         user.is_active = False  # User needs to verify email
         user.save()
