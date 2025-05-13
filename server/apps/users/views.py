@@ -3,7 +3,7 @@ from typing import TYPE_CHECKING, Any
 from drf_spectacular.utils import extend_schema
 from rest_framework import generics, status, viewsets
 from rest_framework.decorators import action
-from rest_framework.permissions import AllowAny
+from rest_framework.permissions import AllowAny, IsAuthenticated
 from rest_framework.request import Request
 from rest_framework.response import Response
 from rest_framework_simplejwt.views import TokenObtainPairView, TokenRefreshView
@@ -22,11 +22,13 @@ from server.apps.users.logic.utils import get_custom_user_model
 from server.apps.users.models import VerificationCode
 from server.common.api_response import ApiResponse
 from server.common.notifications.email import EmailNotificationFactory
+from server.common.notifications.telegram import TelegramNotificationFactory
 from server.settings.components import config
 
 User = get_custom_user_model()
 
 if TYPE_CHECKING:
+    from server.apps.users.models import User as UserType
     from server.apps.users.models import UserOnboarding
 
 
@@ -305,3 +307,27 @@ class PasswordResetConfirmView(generics.GenericAPIView):
                     status=status.HTTP_404_NOT_FOUND,
                 )
         return ApiResponse(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
+
+
+@extend_schema(tags=['Telegram'])
+class TelegramViewSet(viewsets.GenericViewSet):
+    permission_classes = (IsAuthenticated,)
+
+    @extend_schema(
+        request=None,
+        responses={200: None},
+        description='Send a message to the Telegram channel',
+        summary='Send Telegram Message',
+    )
+    @action(detail=False, methods=['post'])
+    def send_message(self, request: Request) -> Response:
+        user: UserType = request.user  # type: ignore
+        message = f'This user: {user.first_name} {user.last_name} ({user.email}) \
+        {user.phone_number or ""} has indicated an interest in joining the Affleego \
+        Learn and Club Hub. Kindly act accordingly.'
+        tg_notification = TelegramNotificationFactory.create_notification(message)
+        tg_notification.send()
+        return ApiResponse(
+            message='Message sent successfully.',
+            status=status.HTTP_200_OK,
+        )
