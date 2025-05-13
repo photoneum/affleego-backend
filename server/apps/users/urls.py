@@ -6,12 +6,14 @@ from server.apps.users.views import (
     CustomTokenObtainPairView,
     PasswordResetConfirmView,
     PasswordResetRequestView,
+    TelegramViewSet,
 )
 
 app_name = 'users'
 
 router = DefaultRouter(trailing_slash='')
 router.register('auth', AuthViewSet, basename='auth')
+router.register('telegram', TelegramViewSet, basename='telegram')
 
 urlpatterns = [
     path('', include(router.urls)),
