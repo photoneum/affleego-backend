@@ -90,7 +90,12 @@ class CustomTokenObtainPairSerializer(TokenObtainPairSerializer):
 class CustomTokenRefreshSerializer(TokenRefreshSerializer):
     def validate(self, attrs):
         data = super().validate(attrs)
-        if not self.user.is_verified:  # type: ignore
+        # Get user from refresh token
+        refresh_token = attrs['refresh']
+        refresh = self.token_class(refresh_token)
+        user_id = refresh.payload.get('user_id')
+        user = User.objects.get(id=user_id)
+        if not user.is_verified:
             raise serializers.ValidationError({'email': 'Please verify your email address first.'})
         return data
 

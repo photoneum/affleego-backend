@@ -7,6 +7,8 @@ For the full list of settings and their config, see
 https://docs.djangoproject.com/en/4.2/ref/settings/
 """
 
+from datetime import timedelta
+
 from django.utils.translation import gettext_lazy as _
 
 from server.settings.components import BASE_DIR, config
@@ -368,6 +370,8 @@ REST_FRAMEWORK = {
 }
 
 SIMPLE_JWT = {
+    'ACCESS_TOKEN_LIFETIME': timedelta(minutes=30),
+    'REFRESH_TOKEN_LIFETIME': timedelta(days=1),
     'JWT_AUTH_HEADER_PREFIX': 'Bearer',
     'JWT_AUTH_HEADER_ENCODING': 'utf-8',
 }
