@@ -34,6 +34,9 @@ class User(AbstractUser, UUIDMixin):
     email = models.EmailField(_('email address'), unique=True)
     phone_number = models.CharField(_('phone number'), blank=True, max_length=20)
     image = models.ImageField(_('image'), upload_to='users/', null=True, blank=True)
+    timezone = models.CharField(_('timezone'), max_length=50, default='UTC')
+    locale = models.CharField(_('locale'), max_length=10, default='en')
+    last_login_ip = models.GenericIPAddressField(_('last login IP'), null=True, blank=True)
     is_verified = models.BooleanField(
         _('verified'),
         default=False,
@@ -143,7 +146,7 @@ class VerificationCode(models.Model):
     ) -> 'VerificationCode':
         """Generate a new verification code for the user."""
         # Generate a random 12-character code with letters and numbers
-        import string  # noqa: PLC0415
+        import string
 
         chars = string.ascii_letters + string.digits
         code = ''.join(secrets.choice(chars) for _ in range(12))

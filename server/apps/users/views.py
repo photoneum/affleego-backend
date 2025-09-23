@@ -15,6 +15,8 @@ from server.apps.users.logic.serializers import (
     PasswordResetRequestSerializer,
     ResendVerificationCodeSerializer,
     UserOnboardingSerializer,
+    UserProfileSerializer,
+    UserProfileUpdateSerializer,
     UserRegistrationSerializer,
     VerificationSerializer,
 )
@@ -35,6 +37,31 @@ if TYPE_CHECKING:
 @extend_schema(tags=['Authentication'])
 class AuthViewSet(viewsets.GenericViewSet):
     permission_classes = (AllowAny,)
+
+    @extend_schema(
+        responses={200: UserProfileSerializer},
+        description='Get complete user profile data',
+        summary='User Profile',
+    )
+    @action(detail=False, methods=['get'], permission_classes=[IsAuthenticated])
+    def profile(self, request: Request) -> Response:
+        user = request.user
+        serializer = UserProfileSerializer(user)
+        return ApiResponse(serializer.data, status=status.HTTP_200_OK)
+
+    @extend_schema(
+        request=UserProfileUpdateSerializer,
+        responses={200: UserProfileSerializer},
+        description='Update user profile data',
+        summary='Update User Profile',
+    )
+    @action(detail=False, methods=['put'], permission_classes=[IsAuthenticated])
+    def update_profile(self, request: Request) -> Response:
+        user = request.user
+        serializer = UserProfileUpdateSerializer(user, data=request.data, partial=True)
+        serializer.is_valid(raise_exception=True)
+        serializer.save()
+        return ApiResponse(UserProfileSerializer(user).data, status=status.HTTP_200_OK)
 
     @extend_schema(
         request=UserRegistrationSerializer,

@@ -1,6 +1,19 @@
 from rest_framework import serializers
 
-from server.apps.deals.models import Deal
+from server.apps.deals.models import Deal, DealStats
+
+
+class DealStatsSerializer(serializers.ModelSerializer):
+    class Meta:
+        model = DealStats
+        fields = (
+            'uuid',
+            'deal',
+            'period_start',
+            'period_end',
+            'clicks',
+            'impressions',
+        )
 
 
 class DealDetailResponseSerializer(serializers.ModelSerializer[Deal]):

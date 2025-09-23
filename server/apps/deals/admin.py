@@ -1,6 +1,11 @@
 from django.contrib import admin
 
-from server.apps.deals.models import Deal
+from server.apps.deals.models import Deal, DealStats
+
+
+@admin.register(DealStats)
+class DealStatsAdmin(admin.ModelAdmin):
+    list_display = ('deal', 'period_start', 'period_end', 'clicks', 'impressions')
 
 
 @admin.register(Deal)

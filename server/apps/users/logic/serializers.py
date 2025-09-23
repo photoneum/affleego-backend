@@ -12,6 +12,33 @@ from server.apps.users.models import UserOnboarding
 
 User = get_custom_user_model()
 
+
+class UserProfileSerializer(serializers.ModelSerializer['UserModel']):
+    class Meta:
+        model = User
+        fields = (
+            'uuid',
+            'email',
+            'first_name',
+            'last_name',
+            'phone_number',
+            'image',
+            'is_verified',
+            'type',
+            'timezone',
+            'locale',
+            'last_login_ip',
+            'date_joined',
+            'last_login',
+        )
+
+
+class UserProfileUpdateSerializer(serializers.ModelSerializer['UserModel']):
+    class Meta:
+        model = User
+        fields = ('first_name', 'last_name', 'phone_number', 'image', 'timezone', 'locale')
+
+
 if TYPE_CHECKING:
     from server.apps.users.models import User as UserModel
 
