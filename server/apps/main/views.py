@@ -7,7 +7,6 @@ from rest_framework.response import Response
 
 from server.apps.main.logic.serializers import CommunityStatsSerializer
 from server.apps.main.models import CommunityStats
-from server.apps.users.logic.serializers import UserProfileSerializer
 from server.common.api_response import ApiResponse
 
 
@@ -22,15 +21,8 @@ class DashboardViewSet(viewsets.GenericViewSet):
     )
     @action(detail=False, methods=['get'])
     def overview(self, request: Request) -> Response:
-        user = request.user
         # Get latest community stats
         stats = CommunityStats.objects.order_by('-week_starting').first()
         stats_data = CommunityStatsSerializer(stats).data if stats else None
-        user_data = UserProfileSerializer(user).data
-        last_login = getattr(user, 'last_login', None)
-        overview = {
-            'user': user_data,
-            'community_stats': stats_data,
-            'last_login': last_login,
-        }
-        return ApiResponse(overview, status=status.HTTP_200_OK)
+
+        return ApiResponse(stats_data, status=status.HTTP_200_OK)
