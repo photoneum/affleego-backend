@@ -1,6 +1,7 @@
 from typing import final
 
 from django.db import models
+from django.utils.translation import gettext_lazy as _
 from tinymce import models as tinymce_models
 
 from server.apps.users.models import User
@@ -71,3 +72,31 @@ class Deal(UUIDMixin, CreatedAtMixin, UpdatedAtMixin, models.Model):
 
     def __str__(self):
         return self.name
+
+
+# New model for tracking deal metrics
+@final
+class DealStats(UUIDMixin, CreatedAtMixin, UpdatedAtMixin, models.Model):
+    """Model for storing deal performance stats (clicks, impressions, period)."""
+
+    deal = models.ForeignKey(Deal, on_delete=models.CASCADE, related_name='stats', db_index=True)
+    period_start = models.DateField(_('period start'))
+    period_end = models.DateField(_('period end'))
+    clicks = models.IntegerField(_('clicks'), default=0)
+    impressions = models.IntegerField(_('impressions'), default=0)
+
+    class Meta:
+        verbose_name = _('Deal Stats')
+        verbose_name_plural = _('Deal Stats')
+        constraints = [
+            models.UniqueConstraint(
+                fields=['deal', 'period_start', 'period_end'],
+                name='unique_deal_period',
+            ),
+        ]
+        indexes = [
+            models.Index(fields=['deal', 'period_start', 'period_end']),
+        ]
+
+    def __str__(self) -> str:
+        return f'{self.deal.name} ({self.period_start} - {self.period_end})'
