@@ -20,6 +20,8 @@ if TYPE_CHECKING:
     from django.http import HttpRequest
 
 # Setting the development status:
+SECRET_KEY = 'dev-secret-key'
+ROOT_URLCONF = 'server.urls'
 
 DEBUG = True
 

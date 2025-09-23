@@ -21,7 +21,7 @@ from drf_spectacular.views import (
 from health_check import urls as health_urls
 
 from server.apps.deals import urls as deals_urls
-from server.apps.main.views import index
+from server.apps.main import urls as main_urls
 from server.apps.users import urls as users_urls
 
 admin.autodiscover()
@@ -54,6 +54,10 @@ urlpatterns = [
         f'{API_PREFIX}/{API_VERSION}/',
         include(deals_urls, namespace='deals'),
     ),
+    path(
+        f'{API_PREFIX}/{API_VERSION}/',
+        include(main_urls, namespace='main'),
+    ),
     # Health checks:
     path('health/', include(health_urls)),
     # tinymce:
@@ -77,7 +81,7 @@ urlpatterns = [
         ),
     ),
     # It is a good practice to have explicit index view:
-    path('', index, name='index'),
+    # path('', index, name='index'),
 ]
 
 if settings.DEBUG:  # pragma: no cover
