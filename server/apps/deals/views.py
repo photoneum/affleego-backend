@@ -1,3 +1,5 @@
+from datetime import timedelta
+
 from django.utils import timezone
 from drf_spectacular.utils import extend_schema
 from rest_framework import status, viewsets
@@ -8,6 +10,7 @@ from rest_framework.response import Response
 
 from server.apps.deals.logic.serializers import (
     DealDetailResponseSerializer,
+    DealStatsOverviewSerializer,
     DealStatsSerializer,
 )
 from server.apps.deals.models import Deal, DealStats
@@ -73,6 +76,42 @@ class DealStatsViewSet(viewsets.ViewSet):
         stats.impressions += 1
         stats.save()
         return ApiResponse('Impression recorded.')
+
+    @extend_schema(
+        summary='Get overview statistics for deals',
+        responses={200: DealStatsOverviewSerializer},
+    )
+    @action(detail=False, methods=['get'], url_path='overview')
+    def overview(self, request: Request) -> Response:
+        today = timezone.now().date()
+        start_of_week = today - timedelta(days=today.weekday())
+        end_of_week = start_of_week + timedelta(days=6)
+
+        # Featured deals
+        featured_count = Deal.objects.filter(is_featured=True).count()
+
+        # Hot deals: deals with stats in current week and clicks > 0
+        hot_deals_count = (
+            DealStats.objects.filter(
+                period_start__gte=start_of_week, period_end__lte=end_of_week, clicks__gt=0
+            )
+            .values('deal')
+            .distinct()
+            .count()
+        )
+
+        # All deals
+        all_deals_count = Deal.objects.count()
+
+        data = {
+            'featured_deals': featured_count,
+            'hot_deals': hot_deals_count,
+            'week_start': str(start_of_week),
+            'week_end': str(end_of_week),
+            'all_deals': all_deals_count,
+        }
+
+        return ApiResponse(data, status=status.HTTP_200_OK)
 
 
 @extend_schema(tags=['Deals'])

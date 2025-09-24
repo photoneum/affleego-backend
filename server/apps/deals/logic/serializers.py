@@ -49,3 +49,16 @@ class DealStatsSerializer(serializers.ModelSerializer):
             'impressions',
         )
         read_only_fields = ('uuid', 'created_at', 'updated_at')
+
+
+class DealStatsOverviewSerializer(serializers.Serializer):
+    """Serializer for deal stats overview response.
+
+    Returns statistics for featured, hot, and all deals, including week period.
+    """
+
+    featured_deals = serializers.IntegerField()
+    hot_deals = serializers.IntegerField()
+    week_start = serializers.DateField()
+    week_end = serializers.DateField()
+    all_deals = serializers.IntegerField()
