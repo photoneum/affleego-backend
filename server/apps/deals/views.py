@@ -33,10 +33,14 @@ class DealStatsViewSet(viewsets.ViewSet):
         today = timezone.now().date()
         start_of_week = today - timedelta(days=today.weekday())
         end_of_week = start_of_week + timedelta(days=6)
-        stats_qs = DealStats.objects.filter(
-            period_start__gte=start_of_week,
-            period_end__lte=end_of_week,
-        ).order_by('-clicks')[:10]
+        stats_qs = (
+            DealStats.objects.filter(
+                period_start__gte=start_of_week,
+                period_end__lte=end_of_week,
+            )
+            .order_by('deal', '-clicks', '-impressions')
+            .distinct('deal')[:10]
+        )
         serializer = DealStatsSerializer(stats_qs, many=True)
         return ApiResponse(serializer.data, status=status.HTTP_200_OK)
 
