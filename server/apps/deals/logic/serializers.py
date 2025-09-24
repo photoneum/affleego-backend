@@ -7,6 +7,7 @@ class DealDetailResponseSerializer(serializers.ModelSerializer[Deal]):
     """Serializer for detailed Deal representation."""
 
     keywords = serializers.SerializerMethodField()
+    logo_url = serializers.CharField(source='get_logo_url', read_only=True)
 
     class Meta:
         model = Deal
@@ -23,6 +24,7 @@ class DealDetailResponseSerializer(serializers.ModelSerializer[Deal]):
             'referral_link',
             'description',
             'keywords',
+            'logo_url',
         )
 
     def get_keywords(self, obj: Deal) -> list[str]:
