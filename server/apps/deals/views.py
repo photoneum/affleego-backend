@@ -1,3 +1,5 @@
+from datetime import timedelta
+
 from django.utils import timezone
 from drf_spectacular.utils import extend_schema
 from rest_framework import status, viewsets
@@ -8,19 +10,20 @@ from rest_framework.response import Response
 
 from server.apps.deals.logic.serializers import (
     DealDetailResponseSerializer,
+    DealStatsOverviewSerializer,
     DealStatsSerializer,
 )
 from server.apps.deals.models import Deal, DealStats
 from server.common.api_response import ApiResponse
+from server.common.serializers import ApiResponseSerializer
 
 
-@extend_schema(tags=['Deals'])
-class DealViewSet(viewsets.ModelViewSet):
-    """ViewSet for managing deals."""
+@extend_schema(tags=['Deals Stats'])
+class DealStatsViewSet(viewsets.ViewSet):
+    """ViewSet for deal stats actions (top deals, click, impression)."""
 
-    queryset = Deal.objects.all()
-    serializer_class = DealDetailResponseSerializer
     permission_classes = [IsAuthenticated]
+    lookup_field = 'uuid'
 
     @extend_schema(
         summary='Get top performing deals of the week',
@@ -28,27 +31,25 @@ class DealViewSet(viewsets.ModelViewSet):
     )
     @action(detail=False, methods=['get'], url_path='top')
     def top(self, request: Request) -> Response:
-        """Get top performing deals for the current week."""
         from datetime import timedelta
 
         today = timezone.now().date()
         start_of_week = today - timedelta(days=today.weekday())
         end_of_week = start_of_week + timedelta(days=6)
-        stats_qs = DealStats.objects.filter(
-            period_start__gte=start_of_week,
-            period_end__lte=end_of_week,
-        ).order_by('-clicks')[:10]
+        stats_qs = (
+            DealStats.objects.filter(
+                period_start__gte=start_of_week,
+                period_end__lte=end_of_week,
+            )
+            .order_by('deal', '-clicks', '-impressions')
+            .distinct('deal')[:10]
+        )
         serializer = DealStatsSerializer(stats_qs, many=True)
         return ApiResponse(serializer.data, status=status.HTTP_200_OK)
 
-    @extend_schema(
-        summary='Record a click for a deal',
-        responses={200: ApiResponse},
-    )
     @action(detail=True, methods=['post'], url_path='click')
-    def record_click(self, request: Request, pk=None) -> Response:
-        """Record a click event for a deal."""
-        deal = self.get_object()
+    def record_click(self, request: Request, uuid=None) -> Response:
+        deal = Deal.objects.get(uuid=uuid)
         today = timezone.now().date()
         stats, _ = DealStats.objects.get_or_create(
             deal=deal,
@@ -61,12 +62,11 @@ class DealViewSet(viewsets.ModelViewSet):
 
     @extend_schema(
         summary='Record an impression for a deal',
-        responses={200: ApiResponse},
+        responses={200: ApiResponseSerializer},
     )
     @action(detail=True, methods=['post'], url_path='impression')
-    def record_impression(self, request: Request, pk=None) -> Response:
-        """Record an impression event for a deal."""
-        deal = self.get_object()
+    def record_impression(self, request: Request, uuid=None) -> Response:
+        deal = Deal.objects.get(uuid=uuid)
         today = timezone.now().date()
         stats, _ = DealStats.objects.get_or_create(
             deal=deal,
@@ -76,6 +76,51 @@ class DealViewSet(viewsets.ModelViewSet):
         stats.impressions += 1
         stats.save()
         return ApiResponse('Impression recorded.')
+
+    @extend_schema(
+        summary='Get overview statistics for deals',
+        responses={200: DealStatsOverviewSerializer},
+    )
+    @action(detail=False, methods=['get'], url_path='overview')
+    def overview(self, request: Request) -> Response:
+        today = timezone.now().date()
+        start_of_week = today - timedelta(days=today.weekday())
+        end_of_week = start_of_week + timedelta(days=6)
+
+        # Featured deals
+        featured_count = Deal.objects.filter(is_featured=True).count()
+
+        # Hot deals: deals with stats in current week and clicks > 0
+        hot_deals_count = (
+            DealStats.objects.filter(
+                period_start__gte=start_of_week, period_end__lte=end_of_week, clicks__gt=0
+            )
+            .values('deal')
+            .distinct()
+            .count()
+        )
+
+        # All deals
+        all_deals_count = Deal.objects.count()
+
+        data = {
+            'featured_deals': featured_count,
+            'hot_deals': hot_deals_count,
+            'week_start': str(start_of_week),
+            'week_end': str(end_of_week),
+            'all_deals': all_deals_count,
+        }
+
+        return ApiResponse(data, status=status.HTTP_200_OK)
+
+
+@extend_schema(tags=['Deals'])
+class DealViewSet(viewsets.ModelViewSet):
+    """ViewSet for managing deals."""
+
+    queryset = Deal.objects.all()
+    serializer_class = DealDetailResponseSerializer
+    permission_classes = [IsAuthenticated]
 
     @extend_schema(
         responses={200: DealDetailResponseSerializer(many=True)},

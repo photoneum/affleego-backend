@@ -53,6 +53,12 @@ class Deal(UUIDMixin, CreatedAtMixin, UpdatedAtMixin, models.Model):
         blank=True,
         help_text='The keywords for the deal, comma separated',
     )
+    logo = models.ImageField(
+        upload_to='deal_logos/',
+        blank=True,
+        null=True,
+        help_text='Logo of the company offering the deal',
+    )
     created_by = models.ForeignKey(
         User,
         on_delete=models.SET_NULL,
@@ -72,6 +78,11 @@ class Deal(UUIDMixin, CreatedAtMixin, UpdatedAtMixin, models.Model):
 
     def __str__(self):
         return self.name
+
+    def get_logo_url(self):
+        if self.logo and hasattr(self.logo, 'url'):
+            return self.logo.url
+        return None
 
 
 # New model for tracking deal metrics
