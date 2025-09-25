@@ -1,6 +1,6 @@
 from rest_framework import serializers
 
-from server.apps.main.models import CommunityStats
+from server.apps.main.models import CommunityStats, Promotions
 
 
 class CommunityStatsSerializer(serializers.ModelSerializer):
@@ -30,3 +30,22 @@ class CommunityStatsSerializer(serializers.ModelSerializer):
             'updated_at',
         )
         read_only_fields = ('uuid', 'created_at', 'updated_at')
+
+
+class PromotionsSerializer(serializers.ModelSerializer):
+    created_by = serializers.StringRelatedField(read_only=True)
+    image_background = serializers.ImageField(required=False, allow_null=True)
+
+    class Meta:
+        model = Promotions
+        fields = (
+            'uuid',
+            'title',
+            'content',
+            'image_background',
+            'cta_url',
+            'created_by',
+            'created_at',
+            'updated_at',
+        )
+        read_only_fields = ('uuid', 'created_by', 'created_at', 'updated_at')
