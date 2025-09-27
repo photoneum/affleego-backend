@@ -1,6 +1,7 @@
 from rest_framework import serializers
 
 from server.apps.deals.models import Deal, DealStats
+from server.common.serializers import PaginationMetadataSerializer
 
 
 class DealDetailResponseSerializer(serializers.ModelSerializer[Deal]):
@@ -62,3 +63,10 @@ class DealStatsOverviewSerializer(serializers.Serializer):
     week_start = serializers.DateField()
     week_end = serializers.DateField()
     all_deals = serializers.IntegerField()
+
+
+class DealPaginatedResponseSerializer(serializers.Serializer):
+    """Serializer for paginated Deal response."""
+
+    results = DealDetailResponseSerializer(many=True)
+    pagination = PaginationMetadataSerializer()

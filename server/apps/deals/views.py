@@ -1,7 +1,7 @@
 from datetime import timedelta
 
 from django.utils import timezone
-from drf_spectacular.utils import extend_schema
+from drf_spectacular.utils import OpenApiParameter, extend_schema
 from rest_framework import status, viewsets
 from rest_framework.decorators import action
 from rest_framework.permissions import IsAuthenticated
@@ -10,12 +10,14 @@ from rest_framework.response import Response
 
 from server.apps.deals.logic.serializers import (
     DealDetailResponseSerializer,
+    DealPaginatedResponseSerializer,
     DealStatsOverviewSerializer,
     DealStatsSerializer,
 )
 from server.apps.deals.models import Deal, DealStats
 from server.common.api_response import ApiResponse
 from server.common.serializers import ApiResponseSerializer
+from server.common.utils.pagination import PaginationHelper
 
 
 @extend_schema(tags=['Deals Stats'])
@@ -153,17 +155,87 @@ class DealViewSet(viewsets.ModelViewSet):
         )
 
     @extend_schema(
-        responses={200: DealDetailResponseSerializer(many=True)},
-        description='List featured deals',
+        responses={200: DealPaginatedResponseSerializer},
+        description=(
+            'List featured deals with pagination and ordering. Returns paginated results with '
+            'metadata including current page, total pages, and navigation information.'
+        ),
         summary='Featured Deals',
+        parameters=[
+            OpenApiParameter(
+                name='page',
+                description='Page number',
+                required=False,
+                type=int,
+                default=1,
+            ),
+            OpenApiParameter(
+                name='page_size',
+                description='Number of deals per page',
+                required=False,
+                type=int,
+                default=10,
+            ),
+            OpenApiParameter(
+                name='order_by',
+                description='Field to order by',
+                required=False,
+                type=str,
+                default='updated_at',
+                enum=['updated_at', 'created_at', 'name'],
+            ),
+            OpenApiParameter(
+                name='order',
+                description='Order direction',
+                required=False,
+                type=str,
+                default='desc',
+                enum=['asc', 'desc'],
+            ),
+        ],
     )
     @action(detail=False, methods=['get'])
     def featured(self, request: Request) -> Response:
-        """List featured deals."""
-        featured_deals = self.get_queryset().filter(is_featured=True)
-        serializer = self.get_serializer(featured_deals, many=True)
+        """List featured deals with pagination and ordering."""
+        # Get query parameters with defaults
+        page = int(request.query_params.get('page', 1))
+        page_size = int(request.query_params.get('page_size', 10))
+        order_by = request.query_params.get('order_by', 'updated_at')
+        order = request.query_params.get('order', 'desc')
+
+        # Validate order_by field
+        allowed_fields = ['updated_at', 'created_at', 'name']
+        if order_by not in allowed_fields:
+            return ApiResponse(
+                data=None,
+                message=f'Invalid order_by field. Allowed: {", ".join(allowed_fields)}',
+                status=status.HTTP_400_BAD_REQUEST,
+            )
+
+        # Build ordering string
+        ordering = f'-{order_by}' if order == 'desc' else order_by
+
+        # Get featured deals with ordering
+        featured_deals = self.get_queryset().filter(is_featured=True).order_by(ordering)
+
+        # Use PaginationHelper to handle pagination
+        pagination_data, is_valid_page = PaginationHelper.paginate_queryset(
+            queryset=featured_deals,
+            page=page,
+            page_size=page_size,
+            serializer_class=self.get_serializer_class(),
+            serializer_context=self.get_serializer_context(),
+        )
+
+        if not is_valid_page:
+            return ApiResponse(
+                data=None,
+                message=pagination_data['error'],
+                status=status.HTTP_404_NOT_FOUND,
+            )
+
         return ApiResponse(
-            data=serializer.data,
+            data=pagination_data,
             message='Featured deals retrieved successfully',
             status=status.HTTP_200_OK,
         )
