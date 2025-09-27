@@ -12,6 +12,7 @@ from server.apps.deals.logic.serializers import (
     DealDetailResponseSerializer,
     DealPaginatedResponseSerializer,
     DealStatsOverviewSerializer,
+    DealStatsPaginatedResponseSerializer,
     DealStatsSerializer,
 )
 from server.apps.deals.models import Deal, DealStats
@@ -28,26 +29,70 @@ class DealStatsViewSet(viewsets.ViewSet):
     lookup_field = 'uuid'
 
     @extend_schema(
-        summary='Get top performing deals of the week',
-        responses={200: DealStatsSerializer(many=True)},
+        responses={200: DealStatsPaginatedResponseSerializer},
+        description=(
+            'Get top performing deals of the week with pagination and ordering. Returns paginated '
+            'results with metadata including current page, total pages, and navigation information.'
+        ),
+        summary='Top Performing Deals',
+        parameters=[
+            OpenApiParameter(
+                name='page',
+                description='Page number',
+                required=False,
+                type=int,
+                default=1,
+            ),
+            OpenApiParameter(
+                name='page_size',
+                description='Number of deals per page',
+                required=False,
+                type=int,
+                default=10,
+            ),
+        ],
     )
     @action(detail=False, methods=['get'], url_path='top')
     def top(self, request: Request) -> Response:
-        from datetime import timedelta
+        """Get top performing deals of the week with pagination and ordering."""
+        # Get query parameters with defaults
+        page = int(request.query_params.get('page', 1))
+        page_size = int(request.query_params.get('page_size', 10))
 
+        # Get current week stats
         today = timezone.now().date()
         start_of_week = today - timedelta(days=today.weekday())
         end_of_week = start_of_week + timedelta(days=6)
+
         stats_qs = (
             DealStats.objects.filter(
                 period_start__gte=start_of_week,
                 period_end__lte=end_of_week,
             )
             .order_by('deal', '-clicks', '-impressions')
-            .distinct('deal')[:10]
+            .distinct('deal')
         )
-        serializer = DealStatsSerializer(stats_qs, many=True)
-        return ApiResponse(serializer.data, status=status.HTTP_200_OK)
+
+        # Use PaginationHelper to handle pagination
+        pagination_data, is_valid_page = PaginationHelper.paginate_queryset(
+            queryset=stats_qs,
+            page=page,
+            page_size=page_size,
+            serializer_class=DealStatsSerializer,
+        )
+
+        if not is_valid_page:
+            return ApiResponse(
+                data=None,
+                message=pagination_data['error'],
+                status=status.HTTP_404_NOT_FOUND,
+            )
+
+        return ApiResponse(
+            data=pagination_data,
+            message='Top performing deals retrieved successfully',
+            status=status.HTTP_200_OK,
+        )
 
     @action(detail=True, methods=['post'], url_path='click')
     def record_click(self, request: Request, uuid=None) -> Response:

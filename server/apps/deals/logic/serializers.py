@@ -70,3 +70,10 @@ class DealPaginatedResponseSerializer(serializers.Serializer):
 
     results = DealDetailResponseSerializer(many=True)
     pagination = PaginationMetadataSerializer()
+
+
+class DealStatsPaginatedResponseSerializer(serializers.Serializer):
+    """Serializer for paginated Deal Stats response."""
+
+    results = DealStatsSerializer(many=True)
+    pagination = PaginationMetadataSerializer()
