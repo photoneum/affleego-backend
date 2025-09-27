@@ -7,7 +7,7 @@ class DealDetailResponseSerializer(serializers.ModelSerializer[Deal]):
     """Serializer for detailed Deal representation."""
 
     keywords = serializers.SerializerMethodField()
-    logo_url = serializers.CharField(source='get_logo_url', read_only=True)
+    logo_url = serializers.ImageField(source='logo', required=False, allow_null=True)
 
     class Meta:
         model = Deal

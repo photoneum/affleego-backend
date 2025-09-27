@@ -32,21 +32,21 @@ class DashboardViewSet(viewsets.GenericViewSet):
 
 
 @extend_schema(tags=['Promotions'])
-class PromotionsViewSet(viewsets.ModelViewSet):
+class PromotionsViewSet(viewsets.GenericViewSet):
     queryset = Promotions.objects.all()
     serializer_class = PromotionsSerializer
     permission_classes = [IsAuthenticated]
 
-    def perform_create(self, serializer):
-        """Set the created_by field to the current user."""
-        serializer.save(created_by=self.request.user)
-
     @extend_schema(
         description='List all promotions',
         summary='List promotions',
+        responses={200: PromotionsSerializer(many=True)},
     )
-    def list(self, request, *args, **kwargs):
-        return super().list(request, *args, **kwargs)
+    def list(self, request: Request) -> Response:
+        """List all promotions."""
+        queryset = self.get_queryset()
+        serializer = self.get_serializer(queryset, many=True)
+        return ApiResponse(serializer.data, status=status.HTTP_200_OK)
 
     @extend_schema(
         description='Create a new promotion',
@@ -72,38 +72,59 @@ class PromotionsViewSet(viewsets.ModelViewSet):
                 'required': ['title', 'content', 'cta_url'],
             }
         },
+        responses={201: PromotionsSerializer},
     )
-    def create(self, request, *args, **kwargs):
+    def create(self, request: Request) -> Response:
+        """Create a new promotion."""
         serializer = self.get_serializer(data=request.data)
         serializer.is_valid(raise_exception=True)
-        self.perform_create(serializer)
-        headers = self.get_success_headers(serializer.data)
-        return ApiResponse(serializer.data, status=status.HTTP_201_CREATED, headers=headers)
+        serializer.save(created_by=request.user)
+        return ApiResponse(serializer.data, status=status.HTTP_201_CREATED)
 
     @extend_schema(
         description='Retrieve a specific promotion by UUID',
         summary='Get promotion',
+        responses={200: PromotionsSerializer},
     )
-    def retrieve(self, request, *args, **kwargs):
-        return super().retrieve(request, *args, **kwargs)
+    def retrieve(self, request: Request, pk: str) -> Response:
+        """Retrieve a specific promotion by UUID."""
+        promotion = self.get_object()
+        serializer = self.get_serializer(promotion)
+        return ApiResponse(serializer.data, status=status.HTTP_200_OK)
 
     @extend_schema(
         description='Update a promotion',
         summary='Update promotion',
+        responses={200: PromotionsSerializer},
     )
-    def update(self, request, *args, **kwargs):
-        return super().update(request, *args, **kwargs)
+    def update(self, request: Request, pk: str) -> Response:
+        """Update a promotion."""
+        promotion = self.get_object()
+        serializer = self.get_serializer(promotion, data=request.data)
+        serializer.is_valid(raise_exception=True)
+        serializer.save()
+        return ApiResponse(serializer.data, status=status.HTTP_200_OK)
 
     @extend_schema(
         description='Partially update a promotion',
         summary='Partial update promotion',
+        responses={200: PromotionsSerializer},
     )
-    def partial_update(self, request, *args, **kwargs):
-        return super().partial_update(request, *args, **kwargs)
+    def partial_update(self, request: Request, pk: str) -> Response:
+        """Partially update a promotion."""
+        promotion = self.get_object()
+        serializer = self.get_serializer(promotion, data=request.data, partial=True)
+        serializer.is_valid(raise_exception=True)
+        serializer.save()
+        return ApiResponse(serializer.data, status=status.HTTP_200_OK)
 
     @extend_schema(
         description='Delete a promotion',
         summary='Delete promotion',
+        responses={204: None},
     )
-    def destroy(self, request, *args, **kwargs):
-        return super().destroy(request, *args, **kwargs)
+    def destroy(self, request: Request, pk: str) -> Response:
+        """Delete a promotion."""
+        promotion = self.get_object()
+        promotion.delete()
+        return ApiResponse(None, status=status.HTTP_204_NO_CONTENT)
