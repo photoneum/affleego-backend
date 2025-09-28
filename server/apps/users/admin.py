@@ -34,6 +34,7 @@ class CustomUserAdmin(UserAdmin):
                 'fields': (
                     'is_verified',
                     'image',
+                    'type',
                 ),
             },
         ),

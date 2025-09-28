@@ -122,6 +122,7 @@ class CustomTokenObtainPairSerializer(TokenObtainPairSerializer):
             'last_name': user.last_name,
             'phone_number': user.phone_number,
             'image_url': user.get_image_url,
+            'type': user.type,
         }
         return data
 
