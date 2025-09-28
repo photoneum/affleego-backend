@@ -13,6 +13,10 @@ from server.apps.users.models import UserOnboarding
 User = get_custom_user_model()
 
 
+if TYPE_CHECKING:
+    from server.apps.users.models import User as UserModel
+
+
 class UserProfileSerializer(serializers.ModelSerializer['UserModel']):
     image_url = serializers.ImageField(source='image', read_only=True)
 
@@ -32,6 +36,7 @@ class UserProfileSerializer(serializers.ModelSerializer['UserModel']):
             'last_login_ip',
             'date_joined',
             'last_login',
+            'country',
         )
 
     def to_representation(self, instance: 'UserModel') -> dict[str, Any]:
@@ -47,11 +52,7 @@ class UserProfileSerializer(serializers.ModelSerializer['UserModel']):
 class UserProfileUpdateSerializer(serializers.ModelSerializer['UserModel']):
     class Meta:
         model = User
-        fields = ('first_name', 'last_name', 'phone_number', 'image', 'timezone', 'locale')
-
-
-if TYPE_CHECKING:
-    from server.apps.users.models import User as UserModel
+        fields = ('first_name', 'last_name', 'phone_number', 'image', 'country')
 
 
 class UserRegistrationSerializer(serializers.ModelSerializer['UserModel']):

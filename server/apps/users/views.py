@@ -58,8 +58,7 @@ class AuthViewSet(viewsets.GenericViewSet):
                     'last_name': {'type': 'string'},
                     'phone_number': {'type': 'string'},
                     'image': {'type': 'string', 'format': 'binary'},
-                    'timezone': {'type': 'string'},
-                    'locale': {'type': 'string'},
+                    'country': {'type': 'string'},
                 },
             }
         },
