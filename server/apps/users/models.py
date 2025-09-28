@@ -37,6 +37,7 @@ class User(AbstractUser, UUIDMixin):
     timezone = models.CharField(_('timezone'), max_length=50, default='UTC')
     locale = models.CharField(_('locale'), max_length=10, default='en')
     last_login_ip = models.GenericIPAddressField(_('last login IP'), null=True, blank=True)
+    country = models.CharField(_('country'), max_length=100, blank=True)
     is_verified = models.BooleanField(
         _('verified'),
         default=False,

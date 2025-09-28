@@ -1,0 +1,8 @@
+{
+  "editor.pasteAs.preferences": ["chat.attach.attachments"],
+  "github.copilot.chat.commitMessageGeneration.instructions": [
+    {
+      "text": "Generate a concise and descriptive commit message based on the following changes: Use semantic versioning style (e.g., 'feat:', 'fix:', 'docs:'); Use imperative mood. Keep it under 50 characters if possible. If multiple changes are present, summarize them in a single line."
+    }
+  ]
+}

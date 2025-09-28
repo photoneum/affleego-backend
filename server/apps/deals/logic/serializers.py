@@ -1,13 +1,14 @@
 from rest_framework import serializers
 
 from server.apps.deals.models import Deal, DealStats
+from server.common.serializers import PaginationMetadataSerializer
 
 
 class DealDetailResponseSerializer(serializers.ModelSerializer[Deal]):
     """Serializer for detailed Deal representation."""
 
     keywords = serializers.SerializerMethodField()
-    logo_url = serializers.CharField(source='get_logo_url', read_only=True)
+    logo_url = serializers.ImageField(source='logo', required=False, allow_null=True)
 
     class Meta:
         model = Deal
@@ -62,3 +63,17 @@ class DealStatsOverviewSerializer(serializers.Serializer):
     week_start = serializers.DateField()
     week_end = serializers.DateField()
     all_deals = serializers.IntegerField()
+
+
+class DealPaginatedResponseSerializer(serializers.Serializer):
+    """Serializer for paginated Deal response."""
+
+    results = DealDetailResponseSerializer(many=True)
+    pagination = PaginationMetadataSerializer()
+
+
+class DealStatsPaginatedResponseSerializer(serializers.Serializer):
+    """Serializer for paginated Deal Stats response."""
+
+    results = DealStatsSerializer(many=True)
+    pagination = PaginationMetadataSerializer()

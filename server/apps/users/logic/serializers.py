@@ -13,7 +13,13 @@ from server.apps.users.models import UserOnboarding
 User = get_custom_user_model()
 
 
+if TYPE_CHECKING:
+    from server.apps.users.models import User as UserModel
+
+
 class UserProfileSerializer(serializers.ModelSerializer['UserModel']):
+    image_url = serializers.ImageField(source='image', read_only=True)
+
     class Meta:
         model = User
         fields = (
@@ -22,7 +28,7 @@ class UserProfileSerializer(serializers.ModelSerializer['UserModel']):
             'first_name',
             'last_name',
             'phone_number',
-            'image',
+            'image_url',
             'is_verified',
             'type',
             'timezone',
@@ -30,17 +36,23 @@ class UserProfileSerializer(serializers.ModelSerializer['UserModel']):
             'last_login_ip',
             'date_joined',
             'last_login',
+            'country',
         )
+
+    def to_representation(self, instance: 'UserModel') -> dict[str, Any]:
+        """Override to_representation to include full image URL."""
+        representation = super().to_representation(instance)
+        if instance.image:
+            representation['image_url'] = instance.get_image_url
+        else:
+            representation['image_url'] = None
+        return representation
 
 
 class UserProfileUpdateSerializer(serializers.ModelSerializer['UserModel']):
     class Meta:
         model = User
-        fields = ('first_name', 'last_name', 'phone_number', 'image', 'timezone', 'locale')
-
-
-if TYPE_CHECKING:
-    from server.apps.users.models import User as UserModel
+        fields = ('first_name', 'last_name', 'phone_number', 'image', 'country')
 
 
 class UserRegistrationSerializer(serializers.ModelSerializer['UserModel']):
@@ -110,6 +122,7 @@ class CustomTokenObtainPairSerializer(TokenObtainPairSerializer):
             'last_name': user.last_name,
             'phone_number': user.phone_number,
             'image_url': user.get_image_url,
+            'type': user.type,
         }
         return data
 
