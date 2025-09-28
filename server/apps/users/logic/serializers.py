@@ -14,6 +14,8 @@ User = get_custom_user_model()
 
 
 class UserProfileSerializer(serializers.ModelSerializer['UserModel']):
+    image_url = serializers.ImageField(source='image', read_only=True)
+
     class Meta:
         model = User
         fields = (
@@ -22,7 +24,7 @@ class UserProfileSerializer(serializers.ModelSerializer['UserModel']):
             'first_name',
             'last_name',
             'phone_number',
-            'image',
+            'image_url',
             'is_verified',
             'type',
             'timezone',
@@ -31,6 +33,15 @@ class UserProfileSerializer(serializers.ModelSerializer['UserModel']):
             'date_joined',
             'last_login',
         )
+
+    def to_representation(self, instance: 'UserModel') -> dict[str, Any]:
+        """Override to_representation to include full image URL."""
+        representation = super().to_representation(instance)
+        if instance.image:
+            representation['image_url'] = instance.get_image_url
+        else:
+            representation['image_url'] = None
+        return representation
 
 
 class UserProfileUpdateSerializer(serializers.ModelSerializer['UserModel']):

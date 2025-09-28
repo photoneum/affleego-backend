@@ -50,9 +50,24 @@ class AuthViewSet(viewsets.GenericViewSet):
         return ApiResponse(serializer.data, status=status.HTTP_200_OK)
 
     @extend_schema(
-        request=UserProfileUpdateSerializer,
+        request={
+            'multipart/form-data': {
+                'type': 'object',
+                'properties': {
+                    'first_name': {'type': 'string'},
+                    'last_name': {'type': 'string'},
+                    'phone_number': {'type': 'string'},
+                    'image': {'type': 'string', 'format': 'binary'},
+                    'timezone': {'type': 'string'},
+                    'locale': {'type': 'string'},
+                },
+            }
+        },
         responses={200: UserProfileSerializer},
-        description='Update user profile data',
+        description=(
+            'Update user profile data. The image field accepts binary file uploads. '
+            'Use multipart/form-data content type when uploading files.'
+        ),
         summary='Update User Profile',
     )
     @action(detail=False, methods=['put'], permission_classes=[IsAuthenticated])
